@@ -5,7 +5,7 @@ import (
 	"github.com/Rafael24595/go-collections/collection"
 )
 
-func TestSize(t *testing.T) {
+func TestVectorSize(t *testing.T) {
 	vector := collection.VectorEmpty[int]()
 	vector.Append(0)
 
@@ -17,7 +17,54 @@ func TestSize(t *testing.T) {
     }
 }
 
-func TestContains(t *testing.T) {
+func TestVectorSet(t *testing.T) {
+	vector := collection.VectorFromList([]int{
+		1, 2, 3,
+	})
+
+	position, ok := vector.Get(1)
+	if !ok || *position != 2 {
+        t.Errorf("Vector does not contains %d but it is added.", 2)
+    }
+
+	vector.Set(1, 4)
+	position, ok = vector.Get(1)
+	if !ok || *position != 4 {
+        t.Errorf("Vector does not contains %d but it is added.", 2)
+    }
+}
+
+func TestVectorRemove(t *testing.T) {
+	vector := collection.VectorFromList([]int{
+		1, 2, 3,
+	})
+
+	position, ok := vector.Remove(1)
+	if !ok || *position != 2 {
+        t.Errorf("Vector does not contains %d but it is added.", 2)
+    }
+
+	if len := vector.Size(); len < 2 {
+        t.Errorf("Expected %d but got %d", 2, len)
+    }
+}
+
+func TestVectorShift(t *testing.T) {
+	vector := collection.VectorFromList([]int{
+		1, 2, 3,
+	})
+
+	position, ok := vector.Shift()
+	if !ok || *position != 1 {
+        t.Errorf("Vector does not contains %d but it is added.", 2)
+    }
+
+	if len := vector.Size(); len < 2 {
+        t.Errorf("Expected %d but got %d", 2, len)
+    }
+}
+
+func TestVectorContains(t *testing.T) {
 	vector := collection.VectorEmpty[int]()
 	vector.Append(0)
 
