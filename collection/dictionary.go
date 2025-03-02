@@ -511,9 +511,9 @@ func (c Dictionary[T, K]) Collect() map[T]K {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     newDict := DictionaryMap(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) })
 //     // newDict will contain {"a": "1", "b": "2"}, where the values are transformed to strings
-func DictionaryMap[T comparable, K, E any](c *Dictionary[T, K], predicate func(T, K) E) *Dictionary[T, E] {
+func DictionaryMap[T comparable, K, E any](c IDictionary[T, K], predicate func(T, K) E) IDictionary[T, E] {
 	mapped := map[T]E{}
-	for key, item := range c.items {
+	for key, item := range c.Collect() {
 		mapped[key] = predicate(key, item)
 	}
 	return &Dictionary[T, E]{
