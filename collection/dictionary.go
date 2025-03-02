@@ -480,7 +480,7 @@ func (c Dictionary[T, K]) ValuesVector() *Vector[K] {
 func (c *Dictionary[T, K]) Pairs() []Pair[T, K] {
 	pairs := make([]Pair[T, K], 0, len(c.items))
 	for k, v := range c.items {
-		pairs = append(pairs, newPair(k, v))
+		pairs = append(pairs, NewPair(k, v))
 	}
 	return pairs
 }
