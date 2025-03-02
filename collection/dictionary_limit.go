@@ -1,6 +1,6 @@
 package collection
 
-// DictionaryLimited is a thread-safe key-value store with a fixed size limit. It extends DictionarySync 
+// DictionaryLimit is a thread-safe key-value store with a fixed size limit. It extends DictionarySync
 // and maintains a timeline of inserted keys to track the order of entries.
 //
 // When the size limit is reached, older entries may be removed based on insertion order.
@@ -15,20 +15,20 @@ package collection
 //   - timeline: A Vector[T] maintaining the order of key insertions for eviction tracking.
 //
 // Example usage:
-//     dict := DictionaryLimited[string, int]{size: 3}
+//     dict := DictionaryLimit[string, int]{size: 3}
 //     dict.Put("a", 1)
 //     dict.Put("b", 2)
 //     dict.Put("c", 3)
 //     dict.Put("d", 4) // "a" is removed if using FIFO eviction
 //
 //     value, ok := dict.Get("b") // value = 2, ok = true
-type DictionaryLimited[T comparable, K any] struct {
+type DictionaryLimit[T comparable, K any] struct {
 	DictionarySync[T, K]
 	size     int
 	timeline Vector[T]
 }
 
-// DictionaryLimitedFromMap creates a new DictionaryLimited instance from an existing map while enforcing a size limit.
+// DictionaryLimitFromMap creates a new DictionaryLimit instance from an existing map while enforcing a size limit.
 // It initializes the dictionary with up to `size` key-value pairs from the given map.
 //
 // Parameters:
@@ -36,7 +36,7 @@ type DictionaryLimited[T comparable, K any] struct {
 //   - items: A map containing initial key-value pairs.
 //
 // Returns:
-//   - A pointer to a new DictionaryLimited instance containing up to `size` elements.
+//   - A pointer to a new DictionaryLimit instance containing up to `size` elements.
 //
 // Notes:
 //   - If the provided map has more elements than `size`, only the first `size` elements (based on map iteration order) will be included.
@@ -44,10 +44,10 @@ type DictionaryLimited[T comparable, K any] struct {
 //
 // Example usage:
 //     data := map[string]int{"a": 1, "b": 2, "c": 3, "d": 4}
-//     dict := DictionaryLimitedFromMap(3, data) // dict will contain up to 3 items
-func DictionaryLimitedFromMap[T comparable, K any](size int, items map[T]K) *DictionaryLimited[T, K] {
-	instance := &DictionaryLimited[T, K]{
-		size: size,
+//     dict := DictionaryLimitFromMap(3, data) // dict will contain up to 3 items
+func DictionaryLimitFromMap[T comparable, K any](size int, items map[T]K) *DictionaryLimit[T, K] {
+	instance := &DictionaryLimit[T, K]{
+		size:     size,
 		timeline: *VectorEmpty[T](),
 	}
 
@@ -66,21 +66,21 @@ func DictionaryLimitedFromMap[T comparable, K any](size int, items map[T]K) *Dic
 	return instance
 }
 
-// DictionaryLimitedEmpty creates a new empty DictionaryLimited instance with a specified size limit.
+// DictionaryLimitEmpty creates a new empty DictionaryLimit instance with a specified size limit.
 //
 // Parameters:
 //   - size: The maximum number of entries allowed in the dictionary.
 //
 // Returns:
-//   - A pointer to a new DictionaryLimited instance with no initial elements.
+//   - A pointer to a new DictionaryLimit instance with no initial elements.
 //
 // Example usage:
-//     dict := DictionaryLimitedEmpty[string, int](5) //dictionary with a max size of 5
-func DictionaryLimitedEmpty[T comparable, K any](size int) *DictionaryLimited[T, K] {
-	return DictionaryLimitedFromMap(size, make(map[T]K))
+//     dict := DictionaryLimitEmpty[string, int](5) //dictionary with a max size of 5
+func DictionaryLimitEmpty[T comparable, K any](size int) *DictionaryLimit[T, K] {
+	return DictionaryLimitFromMap(size, make(map[T]K))
 }
 
-// DictionaryLimitedFromVector creates a new DictionaryLimited instance from a Vector.
+// DictionaryLimitFromVector creates a new DictionaryLimit instance from a Vector.
 // It applies a mapping function to transform each element of the Vector into a key.
 //
 // Parameters:
@@ -89,7 +89,7 @@ func DictionaryLimitedEmpty[T comparable, K any](size int) *DictionaryLimited[T,
 //   - mapper: A function that takes an element of type K and returns a key of type T.
 //
 // Returns:
-//   - A pointer to a new DictionaryLimited instance containing up to `size` elements.
+//   - A pointer to a new DictionaryLimit instance containing up to `size` elements.
 //
 // Notes:
 //   - The `mapper` function is used to generate unique keys for each element in the Vector.
@@ -97,13 +97,13 @@ func DictionaryLimitedEmpty[T comparable, K any](size int) *DictionaryLimited[T,
 //
 // Example usage:
 //     vec := VectorFromList([]int{10, 20, 30})
-//     dict := DictionaryLimitedFromVector(2, vec, func(v int) string { return fmt.Sprintf("key_%d", v) })
+//     dict := DictionaryLimitFromVector(2, vec, func(v int) string { return fmt.Sprintf("key_%d", v) })
 //     // The dictionary will contain at most 2 key-value pairs like {"key_10": 10, "key_20": 20}
-func DictionaryLimitedFromVector[T comparable, K any](size int, vector Vector[K], mapper func(K) T) IDictionary[T, K] {
-	return DictionaryLimitedFromList(size, vector.items, mapper)
+func DictionaryLimitFromVector[T comparable, K any](size int, vector Vector[K], mapper func(K) T) IDictionary[T, K] {
+	return DictionaryLimitFromList(size, vector.items, mapper)
 }
 
-// DictionaryLimitedFromList creates a new DictionaryLimited instance from a list of values.
+// DictionaryLimitFromList creates a new DictionaryLimit instance from a list of values.
 // It maps each element in the list to a key using the provided mapping function, and inserts them
 // into the dictionary while enforcing the specified size limit.
 //
@@ -113,7 +113,7 @@ func DictionaryLimitedFromVector[T comparable, K any](size int, vector Vector[K]
 //   - mapper: A function that takes an element of type K and returns a key of type T.
 //
 // Returns:
-//   - A pointer to a new DictionaryLimited instance containing up to `size` key-value pairs.
+//   - A pointer to a new DictionaryLimit instance containing up to `size` key-value pairs.
 //
 // Notes:
 //   - The `mapper` function is used to generate unique keys for each element in the list.
@@ -121,10 +121,10 @@ func DictionaryLimitedFromVector[T comparable, K any](size int, vector Vector[K]
 //
 // Example usage:
 //     values := []int{10, 20, 30, 40}
-//     dict := DictionaryLimitedFromList(3, values, func(v int) string { return fmt.Sprintf("key_%d", v) })
+//     dict := DictionaryLimitFromList(3, values, func(v int) string { return fmt.Sprintf("key_%d", v) })
 //     // The dictionary will contain at most 3 key-value pairs like {"key_10": 10, "key_20": 20, "key_30": 30}
-func DictionaryLimitedFromList[T comparable, K any](size int, vector []K, mapper func(K) T) IDictionary[T, K] {
-	mapp := DictionaryLimitedEmpty[T, K](size)
+func DictionaryLimitFromList[T comparable, K any](size int, vector []K, mapper func(K) T) IDictionary[T, K] {
+	mapp := DictionaryLimitEmpty[T, K](size)
 	count := 0
 	for _, v := range vector {
 		if count == size || mapp.timeline.Size() > size {
@@ -138,9 +138,9 @@ func DictionaryLimitedFromList[T comparable, K any](size int, vector []K, mapper
 	return mapp
 }
 
-// Put adds a key-value pair to the DictionaryLimited, updating the value if the key already exists.
+// Put adds a key-value pair to the DictionaryLimit, updating the value if the key already exists.
 // It returns the old value associated with the key, if any, and a boolean indicating whether
-// the key already existed in the DictionaryLimited (true if it existed, false otherwise).
+// the key already existed in the DictionaryLimit (true if it existed, false otherwise).
 //
 // Parameters:
 //   - key: The key of type T to associate with the given value.
@@ -148,20 +148,20 @@ func DictionaryLimitedFromList[T comparable, K any](size int, vector []K, mapper
 //
 // Returns:
 //   - A pointer to the old value associated with the key, or nil if the key did not exist.
-//   - A boolean indicating whether the key was already present in the DictionaryLimited (true if it existed).
+//   - A boolean indicating whether the key was already present in the DictionaryLimit (true if it existed).
 //
 // Example usage:
-//     dict := DictionaryLimitedFromMap(map[string]int{"a": 1, "b": 2})
+//     dict := DictionaryLimitFromMap(map[string]int{"a": 1, "b": 2})
 //     oldValue, exists := dict.Put("a", 3) // oldValue will be a pointer to 1, exists will be true
 //     oldValue, exists = dict.Put("c", 4)  // oldValue will be nil, exists will be false
-func (c *DictionaryLimited[T, K]) Put(key T, item K) (*K, bool) {
+func (c *DictionaryLimit[T, K]) Put(key T, item K) (*K, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	
+
 	old, exists := c.items[key]
 	c.items[key] = item
 
-	if index, ok:= c.timeline.IndexOf(func(t T) bool {
+	if index, ok := c.timeline.IndexOf(func(t T) bool {
 		return key == t
 	}); ok {
 		c.timeline.Remove(index)
@@ -177,7 +177,7 @@ func (c *DictionaryLimited[T, K]) Put(key T, item K) (*K, bool) {
 	return &old, exists
 }
 
-// PutIfAbsent adds a key-value pair to the DictionaryLimited only if the key does not already exist.
+// PutIfAbsent adds a key-value pair to the DictionaryLimit only if the key does not already exist.
 // If the key is already present, it does nothing and returns the existing value associated with the key,
 // along with a boolean indicating that the key was already present.
 //
@@ -187,24 +187,24 @@ func (c *DictionaryLimited[T, K]) Put(key T, item K) (*K, bool) {
 //
 // Returns:
 //   - A pointer to the old value associated with the key, or nil if the key was not found.
-//   - A boolean indicating whether the key was already present in the DictionaryLimited (true if it existed, false if it was absent).
+//   - A boolean indicating whether the key was already present in the DictionaryLimit (true if it existed, false if it was absent).
 //
 // Example usage:
-//     dict := DictionaryLimitedFromMap(map[string]int{"a": 1, "b": 2})
+//     dict := DictionaryLimitFromMap(map[string]int{"a": 1, "b": 2})
 //     oldValue, exists := dict.PutIfAbsent("a", 3) // oldValue will be a pointer to 1, exists will be true
 //     oldValue, exists = dict.PutIfAbsent("c", 4)  // oldValue will be nil, exists will be false
-func (c *DictionaryLimited[T, K]) PutIfAbsent(key T, item K) (*K, bool) {
+func (c *DictionaryLimit[T, K]) PutIfAbsent(key T, item K) (*K, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	old, exists :=  c.items[key]
+	old, exists := c.items[key]
 	if exists {
-		return &old, exists	
+		return &old, exists
 	}
 
 	c.items[key] = item
 
-	if index, ok:= c.timeline.IndexOf(func(t T) bool {
+	if index, ok := c.timeline.IndexOf(func(t T) bool {
 		return key == t
 	}); ok {
 		c.timeline.Remove(index)
@@ -219,20 +219,20 @@ func (c *DictionaryLimited[T, K]) PutIfAbsent(key T, item K) (*K, bool) {
 	return &old, exists
 }
 
-// PutAll adds all key-value pairs from another map to the DictionaryLimited
-// overwriting any existing values for the keys that already exist in the DictionaryLimited.
+// PutAll adds all key-value pairs from another map to the DictionaryLimit
+// overwriting any existing values for the keys that already exist in the DictionaryLimit.
 //
 // Parameters:
-//   - items: A map of type map[T]K containing the key-value pairs to add to the DictionaryLimited.
+//   - items: A map of type map[T]K containing the key-value pairs to add to the DictionaryLimit.
 //
 // Returns:
-//   - The DictionaryLimited itself, with all the new key-value pairs added.
+//   - The DictionaryLimit itself, with all the new key-value pairs added.
 //
 // Example usage:
-//     dict := DictionaryLimitedFromMap(map[string]int{"a": 1, "b": 2})
+//     dict := DictionaryLimitFromMap(map[string]int{"a": 1, "b": 2})
 //     otherMap := map[string]int{"b": 3, "c": 4}
 //     dict.PutAll(otherMap) // dict will contain {"a": 1, "b": 3, "c": 4}
-func (c *DictionaryLimited[T, K]) PutAll(items map[T]K) IDictionary[T, K] {
+func (c *DictionaryLimit[T, K]) PutAll(items map[T]K) IDictionary[T, K] {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
