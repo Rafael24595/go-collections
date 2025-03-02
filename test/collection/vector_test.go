@@ -5,7 +5,7 @@ import (
 	"github.com/Rafael24595/go-collections/collection"
 )
 
-func TestSize(t *testing.T) {
+func TestVectorSize(t *testing.T) {
 	vector := collection.VectorEmpty[int]()
 	vector.Append(0)
 
