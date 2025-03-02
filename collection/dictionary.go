@@ -243,7 +243,7 @@ func (c *Dictionary[T, K]) PutIfAbsent(key T, item K) (*K, bool) {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     otherMap := map[string]int{"b": 3, "c": 4}
 //     dict.PutAll(otherMap) // dict will contain {"a": 1, "b": 3, "c": 4}
-func (c *Dictionary[T, K]) PutAll(items map[T]K) *Dictionary[T, K] {
+func (c *Dictionary[T, K]) PutAll(items map[T]K) IDictionary[T, K] {
 	for key := range items {
 		c.items[key] = items[key]
 	}
@@ -263,8 +263,8 @@ func (c *Dictionary[T, K]) PutAll(items map[T]K) *Dictionary[T, K] {
 //     dict1 := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     dict2 := DictionaryFromMap(map[string]int{"b": 3, "c": 4})
 //     dict1.Merge(dict2) // dict1 will contain {"a": 1, "b": 3, "c": 4}
-func (c *Dictionary[T, K]) Merge(other Dictionary[T, K]) *Dictionary[T, K] {
-	return c.PutAll(other.items)
+func (c *Dictionary[T, K]) Merge(other IDictionary[T, K]) IDictionary[T, K] {
+	return c.PutAll(other.Collect())
 }
 
 // Filter creates a new Dictionary by filtering the key-value pairs in the current Dictionary
@@ -282,7 +282,7 @@ func (c *Dictionary[T, K]) Merge(other Dictionary[T, K]) *Dictionary[T, K] {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     filtered := dict.Filter(func(k string, v int) bool { return v > 1 })
 //     // filtered will contain {"b": 2, "c": 3}
-func (c *Dictionary[T, K]) Filter(predicate func(T, K) bool) *Dictionary[T, K] {
+func (c *Dictionary[T, K]) Filter(predicate func(T, K) bool) IDictionary[T, K] {
 	filter := map[T]K{}
 	for key, v := range c.items {
 		if predicate(key, v) {
@@ -306,7 +306,7 @@ func (c *Dictionary[T, K]) Filter(predicate func(T, K) bool) *Dictionary[T, K] {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     dict.FilterSelf(func(k string, v int) bool { return v > 1 })
 //     // dict will contain {"b": 2, "c": 3}
-func (c *Dictionary[T, K]) FilterSelf(predicate func(T, K) bool) *Dictionary[T, K] {
+func (c *Dictionary[T, K]) FilterSelf(predicate func(T, K) bool) IDictionary[T, K] {
 	filter := map[T]K{}
 	for key, v := range c.items {
 		if predicate(key, v) {
@@ -353,7 +353,7 @@ func (c *Dictionary[T, K]) Remove(key T) (*K, bool) {
 //     // Output:
 //     // a 1
 //     // b 2
-func (c *Dictionary[T, K]) ForEach(predicate func(T, K)) *Dictionary[T, K] {
+func (c *Dictionary[T, K]) ForEach(predicate func(T, K)) IDictionary[T, K] {
 	for k, v := range c.items {
 		predicate(k, v)
 	}
@@ -372,7 +372,7 @@ func (c *Dictionary[T, K]) ForEach(predicate func(T, K)) *Dictionary[T, K] {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     dict.Map(func(k string, v int) int { return v * 2 })
 //     // dict will contain {"a": 2, "b": 4}
-func (c *Dictionary[T, K]) Map(predicate func(T, K) K) *Dictionary[T, K] {
+func (c *Dictionary[T, K]) Map(predicate func(T, K) K) IDictionary[T, K] {
 	for k, v := range c.items {
 		c.items[k] = predicate(k, v)
 	}
@@ -388,7 +388,7 @@ func (c *Dictionary[T, K]) Map(predicate func(T, K) K) *Dictionary[T, K] {
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     dict.Clean() // dict will be empty: {}
-func (c *Dictionary[T, K]) Clean() *Dictionary[T, K] {
+func (c *Dictionary[T, K]) Clean() IDictionary[T, K] {
 	c.items = make(map[T]K)
 	return c
 }
@@ -403,7 +403,7 @@ func (c *Dictionary[T, K]) Clean() *Dictionary[T, K] {
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     clonedDict := dict.Clone() // clonedDict is a new Dictionary with the same contents as dict
-func (c *Dictionary[T, K]) Clone() *Dictionary[T, K] {
+func (c *Dictionary[T, K]) Clone() IDictionary[T, K] {
 	cloned := make(map[T]K)
 	for k, v := range c.items {
 		cloned[k] = v

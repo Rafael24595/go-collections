@@ -274,7 +274,7 @@ func (c *DictionarySync[T, K]) PutIfAbsent(key T, item K) (*K, bool) {
 //     dict := DictionarySyncFromMap(map[string]int{"a": 1, "b": 2})
 //     otherMap := map[string]int{"b": 3, "c": 4}
 //     dict.PutAll(otherMap) // dict will contain {"a": 1, "b": 3, "c": 4}
-func (c *DictionarySync[T, K]) PutAll(items map[T]K) *DictionarySync[T, K] {
+func (c *DictionarySync[T, K]) PutAll(items map[T]K) IDictionary[T, K] {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -297,7 +297,7 @@ func (c *DictionarySync[T, K]) PutAll(items map[T]K) *DictionarySync[T, K] {
 //     dict1 := DictionarySyncFromMap(map[string]int{"a": 1, "b": 2})
 //     dict2 := DictionarySyncFromMap(map[string]int{"b": 3, "c": 4})
 //     dict1.Merge(dict2) // dict1 will contain {"a": 1, "b": 3, "c": 4}
-func (c *DictionarySync[T, K]) Merge(other Dictionary[T, K]) *DictionarySync[T, K] {
+func (c *DictionarySync[T, K]) Merge(other IDictionary[T, K]) IDictionary[T, K] {
 	return c.PutAll(other.Collect())
 }
 
@@ -316,7 +316,7 @@ func (c *DictionarySync[T, K]) Merge(other Dictionary[T, K]) *DictionarySync[T, 
 //     dict := DictionarySyncFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     filtered := dict.Filter(func(k string, v int) bool { return v > 1 })
 //     // filtered will contain {"b": 2, "c": 3}
-func (c *DictionarySync[T, K]) Filter(predicate func(T, K) bool) *DictionarySync[T, K] {
+func (c *DictionarySync[T, K]) Filter(predicate func(T, K) bool) IDictionary[T, K] {
 	c.mu.RLock()
 
 	filter := map[T]K{}
@@ -345,7 +345,7 @@ func (c *DictionarySync[T, K]) Filter(predicate func(T, K) bool) *DictionarySync
 //     dict := DictionarySyncFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     dict.FilterSelf(func(k string, v int) bool { return v > 1 })
 //     // dict will contain {"b": 2, "c": 3}
-func (c *DictionarySync[T, K]) FilterSelf(predicate func(T, K) bool) *DictionarySync[T, K] {
+func (c *DictionarySync[T, K]) FilterSelf(predicate func(T, K) bool) IDictionary[T, K] {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -398,7 +398,7 @@ func (c *DictionarySync[T, K]) Remove(key T) (*K, bool) {
 //     // Output:
 //     // a 1
 //     // b 2
-func (c *DictionarySync[T, K]) ForEach(predicate func(T, K)) *DictionarySync[T, K] {
+func (c *DictionarySync[T, K]) ForEach(predicate func(T, K)) IDictionary[T, K] {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -420,7 +420,7 @@ func (c *DictionarySync[T, K]) ForEach(predicate func(T, K)) *DictionarySync[T, 
 //     dict := DictionarySyncFromMap(map[string]int{"a": 1, "b": 2})
 //     dict.Map(func(k string, v int) int { return v * 2 })
 //     // dict will contain {"a": 2, "b": 4}
-func (c *DictionarySync[T, K]) Map(predicate func(T, K) K) *DictionarySync[T, K] {
+func (c *DictionarySync[T, K]) Map(predicate func(T, K) K) IDictionary[T, K] {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -438,7 +438,7 @@ func (c *DictionarySync[T, K]) Map(predicate func(T, K) K) *DictionarySync[T, K]
 // Example usage:
 //     dict := DictionarySyncFromMap(map[string]int{"a": 1, "b": 2})
 //     dict.Clean() // dict will be empty: {}
-func (c *DictionarySync[T, K]) Clean() *DictionarySync[T, K] {
+func (c *DictionarySync[T, K]) Clean() IDictionary[T, K] {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -456,7 +456,7 @@ func (c *DictionarySync[T, K]) Clean() *DictionarySync[T, K] {
 // Example usage:
 //     dict := DictionarySyncFromMap(map[string]int{"a": 1, "b": 2})
 //     clonedDict := dict.Clone() // clonedDict is a new DictionarySync with the same contents as dict
-func (c *DictionarySync[T, K]) Clone() *DictionarySync[T, K] {
+func (c *DictionarySync[T, K]) Clone() IDictionary[T, K] {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -557,7 +557,7 @@ func (c *DictionarySync[T, K]) Pairs() []Pair[T, K] {
 //     dict := DictionarySyncFromMap(map[string]int{"a": 1, "b": 2})
 //     collectedMap := dict.Collect() // collectedMap will be map[string]int{"a": 1, "b": 2}
 func (c *DictionarySync[T, K]) Collect() map[T]K {
-	return c.items
+	return maps.Clone(c.items)
 }
 
 // DictionarySyncMap creates a new DictionarySync by applying the provided predicate function to each key-value pair in the original DictionarySync.
