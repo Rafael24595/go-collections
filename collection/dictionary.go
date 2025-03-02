@@ -36,8 +36,6 @@ func DictionaryFromMap[T comparable, K any](items map[T]K) *Dictionary[T, K] {
 }
 
 // DictionaryEmpty creates and returns a new, empty Dictionary.
-// It initializes an empty map with keys of type T and values of type K,
-// then constructs a Dictionary using DictionaryFromMap.
 //
 // T must be a comparable type to be used as a map key.
 // K can be any type.
@@ -49,8 +47,6 @@ func DictionaryEmpty[T comparable, K any]() *Dictionary[T, K] {
 }
 
 // DictionaryFromVector creates a Dictionary from a Vector by applying a mapping function.
-// It iterates over the items in the provided Vector and maps each value to a key using
-// the provided mapper function, then constructs a Dictionary.
 //
 // T must be a comparable type to be used as a dictionary key.
 // K can be any type.
@@ -70,8 +66,6 @@ func DictionaryFromVector[T comparable, K any](vector Vector[K], mapper func(K) 
 }
 
 // DictionaryFromList creates a Dictionary from a slice by applying a mapping function.
-// It iterates over the given slice, using the mapper function to generate keys
-// and storing the corresponding values in the Dictionary.
 //
 // T must be a comparable type to be used as a dictionary key.
 // K can be any type.
@@ -124,8 +118,6 @@ func (c *Dictionary[T, K]) Exists(key T) bool {
 }
 
 // Find returns a slice of values from the Dictionary that satisfy the given predicate function.
-// It iterates over all key-value pairs in the Dictionary and applies the predicate to each pair.
-// If the predicate returns true, the corresponding value is added to the result slice.
 //
 // Parameters:
 //   - predicate: A function that takes a key of type T and a value of type K, and returns a boolean.
@@ -149,8 +141,6 @@ func (c *Dictionary[T, K]) Find(predicate func(T, K) bool) []K {
 }
 
 // FindOne searches for the first key-value pair in the Dictionary that satisfies the given predicate function.
-// It iterates over all key-value pairs in the Dictionary and applies the predicate to each pair.
-// If the predicate returns true, the corresponding value is returned along with a true flag.
 //
 // Parameters:
 //   - predicate: A function that takes a key of type T and a value of type K, and returns a boolean.
@@ -240,8 +230,7 @@ func (c *Dictionary[T, K]) PutIfAbsent(key T, item K) (*K, bool) {
 	return old, exists
 }
 
-// PutAll adds all key-value pairs from another map to the Dictionary.
-// It iterates over the provided map and adds each key-value pair to the Dictionary,
+// PutAll adds all key-value pairs from another map to the Dictionary
 // overwriting any existing values for the keys that already exist in the Dictionary.
 //
 // Parameters:
@@ -261,8 +250,7 @@ func (c *Dictionary[T, K]) PutAll(items map[T]K) *Dictionary[T, K] {
 	return c
 }
 
-// Merge combines all key-value pairs from another Dictionary into the current Dictionary.
-// It iterates over the key-value pairs of the provided Dictionary and adds them to the current Dictionary,
+// Merge combines all key-value pairs from another Dictionary into the current Dictionary
 // overwriting any existing values for the keys that already exist.
 //
 // Parameters:
@@ -276,7 +264,7 @@ func (c *Dictionary[T, K]) PutAll(items map[T]K) *Dictionary[T, K] {
 //     dict2 := DictionaryFromMap(map[string]int{"b": 3, "c": 4})
 //     dict1.Merge(dict2) // dict1 will contain {"a": 1, "b": 3, "c": 4}
 func (c *Dictionary[T, K]) Merge(other Dictionary[T, K]) *Dictionary[T, K] {
-	return c.PutAll(c.items)
+	return c.PutAll(other.items)
 }
 
 // Filter creates a new Dictionary by filtering the key-value pairs in the current Dictionary
@@ -288,7 +276,7 @@ func (c *Dictionary[T, K]) Merge(other Dictionary[T, K]) *Dictionary[T, K] {
 //                The function should return true for the key-value pairs that should be kept in the result.
 //
 // Returns:
-//   - The Dictionary itself, after filtering out the key-value pairs that do not satisfy the predicate.
+//   - A new Dictionary itself, after filtering out the key-value pairs that do not satisfy the predicate.
 //
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
@@ -373,7 +361,6 @@ func (c *Dictionary[T, K]) ForEach(predicate func(T, K)) *Dictionary[T, K] {
 }
 
 // Map transforms the values in the Dictionary by applying the provided predicate function to each key-value pair.
-// The predicate function is applied to each key-value pair, and the value is updated to the result of the function.
 //
 // Parameters:
 //   - predicate: A function that takes a key of type T and a value of type K, and returns a new value of type K.
@@ -441,7 +428,6 @@ func (c Dictionary[T, K]) Keys() []T {
 }
 
 // KeysVector returns a Vector containing all the keys in the Dictionary.
-// It internally calls the Keys method to retrieve the keys as a slice and then converts the slice into a Vector.
 //
 // Returns:
 //   - A Vector[T] containing all the keys from the Dictionary.
@@ -470,7 +456,6 @@ func (c *Dictionary[T, K]) Values() []K {
 }
 
 // ValuesVector returns a Vector containing all the values in the Dictionary.
-// It internally calls the Values method to retrieve the values as a slice and then converts the slice into a Vector.
 //
 // Returns:
 //   - A Vector[K] containing all the values from the Dictionary.
@@ -500,8 +485,7 @@ func (c *Dictionary[T, K]) Pairs() []Pair[T, K] {
 	return pairs
 }
 
-// Collect returns the underlying map containing all the key-value pairs in the Dictionary.
-// This method gives direct access to the internal map, allowing the caller to interact with it as a regular map.
+// Collect returns an intance map containing all the key-value pairs in the Dictionary.
 //
 // Returns:
 //   - A map of type map[T]K containing all key-value pairs in the Dictionary.
