@@ -84,3 +84,25 @@ func TestVectorContains(t *testing.T) {
         t.Errorf("Vector contains %d but it is not added.", 9)
     }
 }
+
+func TestVectorAppendIfAbsent(t *testing.T) {
+	vector := collection.VectorFromList([]int{
+		0, 1, 2, 3,
+	})
+
+	vector.AppendIfAbsent(func(i1, i2 int) bool {
+		return i1 != i2
+	}, 2)
+
+	if vector.Size() > 4 {
+        t.Errorf("Vector size is %d but %d expected", vector.Size(), 4)
+    }
+
+	vector.AppendIfAbsent(func(i1, i2 int) bool {
+		return i1 != i2
+	}, 4, 5)
+
+	if vector.Size() > 6 {
+        t.Errorf("Vector size is %d but %d expected", vector.Size(), 6)
+    }
+}

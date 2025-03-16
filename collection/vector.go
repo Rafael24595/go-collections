@@ -271,7 +271,7 @@ func (c *Vector[T]) Set(index int,item T) (*T, bool) {
 //     vec.AppendIfAbsent(func(a, b int) bool { return a == b }, 2) // vec will remain [1, 2, 3, 4, 5], 2 is not added again
 func (c *Vector[T]) AppendIfAbsent(predicate func(T, T) bool, items ...T) *Vector[T] {
     for _, v := range items {
-        if c.Contains(func(t T) bool {
+        if !c.Contains(func(t T) bool {
             return predicate(t, v)
         }) {
             c.items = append(c.items, v)
