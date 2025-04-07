@@ -557,6 +557,8 @@ func (c *DictionarySync[T, K]) Pairs() []Pair[T, K] {
 //     dict := DictionarySyncFromMap(map[string]int{"a": 1, "b": 2})
 //     collectedMap := dict.Collect() // collectedMap will be map[string]int{"a": 1, "b": 2}
 func (c *DictionarySync[T, K]) Collect() map[T]K {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	return maps.Clone(c.items)
 }
 
