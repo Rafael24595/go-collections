@@ -688,9 +688,9 @@ func (c *Vector[T]) Page(page, size int) *Vector[T] {
 //     transformed := VectorMap(vec, func(v int) string { return fmt.Sprintf("Item %d", v) })
 //     // transformed will be a new Vector with elements: ["Item 1", "Item 2", "Item 3", "Item 4"]
 func VectorMap[T, K any](c *Vector[T], predicate func(T) K) *Vector[K] {
-	var mapped []K
-	for _, item := range c.items {
-		mapped = append(mapped, predicate(item))
+	mapped := make([]K, c.Size())
+	for i, item := range c.items {
+		mapped[i] = predicate(item)
 	}
 	return &Vector[K]{
 		items: mapped,

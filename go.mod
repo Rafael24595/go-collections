@@ -1,3 +1,3 @@
 module github.com/Rafael24595/go-collections
 
-go 1.24.0
+go 1.25.3
