@@ -36,6 +36,27 @@ type DictionaryLimit[T comparable, K any] struct {
 //   - items: A map containing initial key-value pairs.
 //
 // Returns:
+//   - A pointer to a new IDictionary instance containing up to `size` elements.
+//
+// Notes:
+//   - If the provided map has more elements than `size`, only the first `size` elements (based on map iteration order) will be included.
+//   - The timeline vector tracks the order of inserted keys for potential eviction policies.
+//
+// Example usage:
+//     data := map[string]int{"a": 1, "b": 2, "c": 3, "d": 4}
+//     dict := DictionaryLimitFromMap(3, data) // dict will contain up to 3 items
+func MakeDictionaryLimit[T comparable, K any](size int, items map[T]K) IDictionary[T, K] {
+	return DictionaryLimitFromMap(size, items)
+}
+
+// DictionaryLimitFromMap creates a new DictionaryLimit instance from an existing map while enforcing a size limit.
+// It initializes the dictionary with up to `size` key-value pairs from the given map.
+//
+// Parameters:
+//   - size: The maximum number of entries allowed in the dictionary.
+//   - items: A map containing initial key-value pairs.
+//
+// Returns:
 //   - A pointer to a new DictionaryLimit instance containing up to `size` elements.
 //
 // Notes:

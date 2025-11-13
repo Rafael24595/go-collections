@@ -24,7 +24,7 @@ func TestDictionaryMap(t *testing.T) {
 
 	mapped := collection.DictionaryMap(dict, func(k string, v int) string {
 		return fmt.Sprintf("value-%d", v)
-	})
+	}, collection.MakeDictionary)
 
 	if value, ok := mapped.Get("1"); !ok || *value != "value-1" {
 		t.Errorf("Expected %s but got %s", "value-1", *value)
