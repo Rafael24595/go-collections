@@ -29,6 +29,20 @@ type DictionarySync[T comparable, K any] struct {
 	items map[T]K
 }
 
+// MakeDictionarySync creates a new DictionarySync from a given map.
+// It takes a map with keys of type T and values of type K and 
+// returns a pointer to a IDictionary containing the same items.
+//
+// T must be a comparable type to be used as a map key.
+// K can be any type.
+//
+// Example usage:
+//     myMap := map[string]int{"a": 1, "b": 2}
+//     dict := MakeDictionarySync(myMap)
+func MakeDictionarySync[T comparable, K any](items map[T]K) IDictionary[T, K] {
+	return DictionarySyncFromMap(items)
+}
+
 // DictionarySyncFromMap creates a new DictionarySync from a given map.
 // It takes a map with keys of type T and values of type K and 
 // returns a pointer to a DictionarySync containing the same items.

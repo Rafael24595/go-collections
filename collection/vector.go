@@ -24,6 +24,22 @@ type Vector[T any] struct {
 	items []T
 }
 
+// MakeVector creates a new Vector from a given slice of elements.
+// It takes a slice of type T and returns a pointer to a new IVector instance that holds the same elements.
+//
+// Parameters:
+//   - items: A slice of elements of type T that will be used to populate the Vector.
+//
+// Returns:
+//   - A pointer to a new IVector containing the same elements as the provided slice.
+//
+// Example usage:
+//     vec := MakeVector([]int{1, 2, 3})
+//     // vec will be a Vector containing [1, 2, 3]
+func MakeVector[T any](items []T) IVector[T] {
+	return VectorFromList(items)
+}
+
 // VectorFromList creates a new Vector from a given slice of elements.
 // It takes a slice of type T and returns a pointer to a new Vector that holds the same elements.
 //
@@ -619,12 +635,12 @@ func (c Vector[T]) Collect() []T {
 //     vec2 := VectorFromList([]int{1, 2, 3})
 //     result2 := vec2.Join(" - ") // result2 will be "1 - 2 - 3"
 func (c *Vector[T]) Join(separator string) string {
-	if items, ok := interface{}(c.items).([]string); ok {
+	if items, ok := any(c.items).([]string); ok {
 		return strings.Join(items, separator)
 	}
 	return VectorMap(c, func(i T) string {
 		return fmt.Sprintf("%v", i)
-	}).Join(separator)
+	}, MakeVector).Join(separator)
 }
 
 // Pages calculates the number of pages required to hold all the elements of the Vector,
@@ -670,29 +686,4 @@ func (c *Vector[T]) Page(page, size int) *Vector[T] {
 	start := (page - 1) * size
 	end := page * size
 	return c.Slice(start, end)
-}
-
-// VectorMap applies the given predicate function to each element in the Vector, 
-// transforming each element of type T into an element of type K, and returns 
-// a new Vector with the transformed elements.
-//
-// Parameters:
-//   - c: The source Vector containing elements of type T.
-//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
-//
-// Returns:
-//   - A new Vector containing the transformed elements of type K.
-//
-// Example usage:
-//     vec := VectorFromList([]int{1, 2, 3, 4})
-//     transformed := VectorMap(vec, func(v int) string { return fmt.Sprintf("Item %d", v) })
-//     // transformed will be a new Vector with elements: ["Item 1", "Item 2", "Item 3", "Item 4"]
-func VectorMap[T, K any](c *Vector[T], predicate func(T) K) *Vector[K] {
-	mapped := make([]K, c.Size())
-	for i, item := range c.items {
-		mapped[i] = predicate(item)
-	}
-	return &Vector[K]{
-		items: mapped,
-	}
 }

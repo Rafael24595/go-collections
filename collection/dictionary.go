@@ -19,6 +19,22 @@ type Dictionary[T comparable, K any] struct {
 	items map[T]K
 }
 
+// MakeDictionary creates a new Dictionary from a given map.
+// It takes a map with keys of type T and values of type K and 
+// returns a pointer to a IDictionary containing the same items.
+//
+// T must be a comparable type to be used as a map key.
+// K can be any type.
+//
+// Example usage:
+//     myMap := map[string]int{"a": 1, "b": 2}
+//     dict := MakeDictionary(myMap)
+func MakeDictionary[T comparable, K any](items map[T]K) IDictionary[T, K] {
+	return &Dictionary[T, K]{
+		items,
+	}
+}
+
 // DictionaryFromMap creates a new Dictionary from a given map.
 // It takes a map with keys of type T and values of type K and 
 // returns a pointer to a Dictionary containing the same items.
@@ -495,28 +511,4 @@ func (c *Dictionary[T, K]) Pairs() []Pair[T, K] {
 //     collectedMap := dict.Collect() // collectedMap will be map[string]int{"a": 1, "b": 2}
 func (c Dictionary[T, K]) Collect() map[T]K {
 	return c.items
-}
-
-// DictionaryMap creates a new Dictionary by applying the provided predicate function to each key-value pair in the original Dictionary.
-// The predicate function is applied to each key and value, and its result is used as the new value in the returned Dictionary.
-//
-// Parameters:
-//   - c: A pointer to the Dictionary[T, K] from which the key-value pairs will be transformed.
-//   - predicate: A function that takes a key of type T and a value of type K, and returns a new value of type E. This function is applied to each key-value pair.
-//
-// Returns:
-//   - A new Dictionary[T, E] where the keys remain the same, but the values are the result of applying the predicate function.
-//
-// Example usage:
-//     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
-//     newDict := DictionaryMap(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) })
-//     // newDict will contain {"a": "1", "b": "2"}, where the values are transformed to strings
-func DictionaryMap[T comparable, K, E any](c IDictionary[T, K], predicate func(T, K) E) IDictionary[T, E] {
-	mapped := map[T]E{}
-	for key, item := range c.Collect() {
-		mapped[key] = predicate(key, item)
-	}
-	return &Dictionary[T, E]{
-		items: mapped,
-	}
 }
