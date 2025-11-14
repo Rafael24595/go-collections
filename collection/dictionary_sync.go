@@ -576,26 +576,40 @@ func (c *DictionarySync[T, K]) Collect() map[T]K {
 	return maps.Clone(c.items)
 }
 
-// DictionarySyncMap creates a new DictionarySync by applying the provided predicate function to each key-value pair in the original DictionarySync.
+// DictionarySyncMap creates a new DictionarySync by applying the provided predicate function to each key-value pair in the original IDictionary.
 // The predicate function is applied to each key and value, and its result is used as the new value in the returned DictionarySync.
 //
 // Parameters:
-//   - c: A pointer to the DictionarySync[T, K] from which the key-value pairs will be transformed.
+//   - c: A pointer to the IDictionary[T, K] from which the key-value pairs will be transformed.
 //   - predicate: A function that takes a key of type T and a value of type K, and returns a new value of type E. This function is applied to each key-value pair.
 //
 // Returns:
-//   - A new DictionarySync[T, E] where the keys remain the same, but the values are the result of applying the predicate function.
+//   - A new Dictionary[T, E] where the keys remain the same, but the values are the result of applying the predicate function.
 //
 // Example usage:
-//     dict := DictionarySyncFromMap(map[string]int{"a": 1, "b": 2})
-//     newDict := DictionarySyncMap(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) })
-//     // newDict will contain {"a": "1", "b": "2"}, where the values are transformed to strings
-func DictionarySyncMap[T comparable, K, E any](c *DictionarySync[T, K], predicate func(T, K) E) *DictionarySync[T, E] {
-	mapped := map[T]E{}
-	for key, item := range c.Collect() {
-		mapped[key] = predicate(key, item)
-	}
-	return &DictionarySync[T, E]{
-		items: mapped,
-	}
+//
+//	dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
+//	newDict := DictionaryMap(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) })
+//	// newDict will contain {"a": "1", "b": "2"}, where the values are transformed to strings
+func DictionarySyncMap[T comparable, K, E any](c IDictionary[T, K], predicate func(T, K) E) IDictionary[T, E] {
+	return MapToDictionary(c.Collect(), predicate)
+}
+
+// MapToDictionary creates a new DictionarySync by applying the provided predicate function to each key-value pair in the provided map.
+// The predicate function is applied to each key and value, and its result is used as the new value in the returned DictionarySync.
+//
+// Parameters:
+//   - c: A map[T]K from which the key-value pairs will be transformed.
+//   - predicate: A function that takes a key of type T and a value of type K, and returns a new value of type E. This function is applied to each key-value pair.
+//
+// Returns:
+//   - A new Dictionary[T, E] where the keys remain the same, but the values are the result of applying the predicate function.
+//
+// Example usage:
+//
+//	dict := map[string]int{"a": 1, "b": 2}
+//	newDict := MapToDictionary(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) })
+//	// newDict will contain {"a": "1", "b": "2"}, where the values are transformed to strings
+func MapToDictionarySync[T comparable, K, E any](c map[T]K, predicate func(T, K) E) IDictionary[T, E] {
+	return MapToIDictionary(c, predicate, MakeDictionarySync)
 }
