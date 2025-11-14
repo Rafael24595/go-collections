@@ -115,13 +115,13 @@ func (c *Vector[T]) Contains(predicate func(T) bool) bool {
 //     vec := VectorFromList([]int{1, 2, 3, 4})
 //     index, found := vec.IndexOf(func(v int) bool { return v == 3 }) // index will be 2, found will be true
 //     index, found := vec.IndexOf(func(v int) bool { return v == 5 }) // index will be -1, found will be false
-func (c *Vector[T]) IndexOf(predicate func(T) bool) (int, bool) {
+func (c *Vector[T]) IndexOf(predicate func(T) bool) int {
 	for i, item := range c.items {
 		if predicate(item) {
-			return i, true
+			return i
 		}
 	}
-	return -1, false
+	return -1
 }
 
 // Find returns a slice of all elements in the Vector that satisfy the given predicate function.
@@ -448,6 +448,11 @@ func (c *Vector[T]) SliceSelf(start, end int) *Vector[T] {
 	return c
 }
 
+func (c *Vector[T]) Unshift(items ...T) *Vector[T] {
+	c.items = append(items, c.items...)
+	return c
+}
+
 // Shift removes and returns the first element of the Vector, shifting all remaining elements left.
 // If the Vector is empty, it returns nil and false.
 //
@@ -686,4 +691,44 @@ func (c *Vector[T]) Page(page, size int) *Vector[T] {
 	start := (page - 1) * size
 	end := page * size
 	return c.Slice(start, end)
+}
+
+// VectorMap applies the given predicate function to each element in the IVector,
+// transforming each element of type T into an element of type K, and returns
+// a new Vector with the transformed elements.
+//
+// Parameters:
+//   - c: The source IVector containing elements of type T.
+//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//
+// Returns:
+//   - A new IVector containing the transformed elements of type K.
+//
+// Example usage:
+//
+//	vec := VectorFromList([]int{1, 2, 3, 4})
+//	transformed := VectorMap(vec, func(v int) string { return fmt.Sprintf("Item %d", v) })
+//	// transformed will be a new Vector with elements: ["Item 1", "Item 2", "Item 3", "Item 4"]
+func VectorMap[T, K any](c *Vector[T], predicate func(T) K, constructor VectorConstructor[K]) IVector[K] {
+	return MapToVector(c.Collect(), predicate)
+}
+
+// MapToVector applies the given predicate function to each element in the slice,
+// transforming each element of type T into an element of type K, and returns
+// a Vector with the transformed elements.
+//
+// Parameters:
+//   - c: The source IVector containing elements of type T.
+//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//
+// Returns:
+//   - A new IVector containing the transformed elements of type K.
+//
+// Example usage:
+//
+//	vec := VectorFromList([]int{1, 2, 3, 4})
+//	transformed := MapToVector(vec, func(v int) string { return fmt.Sprintf("Item %d", v) })
+//	// transformed will be a new Vector with elements: ["Item 1", "Item 2", "Item 3", "Item 4"]
+func MapToVector[T, K any](c []T, predicate func(T) K) IVector[K] {
+	return MapToIVector(c, predicate, MakeVector)
 }

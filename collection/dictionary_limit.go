@@ -182,9 +182,9 @@ func (c *DictionaryLimit[T, K]) Put(key T, item K) (*K, bool) {
 	old, exists := c.items[key]
 	c.items[key] = item
 
-	if index, ok := c.timeline.IndexOf(func(t T) bool {
+	if index := c.timeline.IndexOf(func(t T) bool {
 		return key == t
-	}); ok {
+	}); index != -1 {
 		c.timeline.Remove(index)
 	}
 
@@ -225,9 +225,9 @@ func (c *DictionaryLimit[T, K]) PutIfAbsent(key T, item K) (*K, bool) {
 
 	c.items[key] = item
 
-	if index, ok := c.timeline.IndexOf(func(t T) bool {
+	if index := c.timeline.IndexOf(func(t T) bool {
 		return key == t
-	}); ok {
+	}); index != -1 {
 		c.timeline.Remove(index)
 	}
 	c.timeline.Append(key)

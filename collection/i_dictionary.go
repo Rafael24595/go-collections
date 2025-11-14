@@ -1,6 +1,6 @@
 package collection
 
-type DictionaryConstructor[T comparable, K any] func(map[T]K) IDictionary[T, K]
+type DictionaryConstructor[T comparable, K any, D IDictionary[T, K]] func(map[T]K) D
 
 type IDictionary[T comparable, K any] interface {
 	Size() int
@@ -27,8 +27,8 @@ type IDictionary[T comparable, K any] interface {
 	Collect() map[T]K
 }
 
-// DictionaryMap creates a new Dictionary by applying the provided predicate function to each key-value pair in the original Dictionary.
-// The predicate function is applied to each key and value, and its result is used as the new value in the returned Dictionary.
+// IDictionaryMap creates a new IDictionary by applying the provided predicate function to each key-value pair in the original IDictionary.
+// The predicate function is applied to each key and value, and its result is used as the new value in the returned IDictionary.
 //
 // Parameters:
 //   - c: A pointer to the Dictionary[T, K] from which the key-value pairs will be transformed.
@@ -41,14 +41,14 @@ type IDictionary[T comparable, K any] interface {
 // Example usage:
 //
 //	dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
-//	newDict := DictionaryMap(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) })
+//	newDict := IDictionaryMap(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) }, MakeDictionary)
 //	// newDict will contain {"a": "1", "b": "2"}, where the values are transformed to strings
-func DictionaryMap[T comparable, K, E any](c IDictionary[T, K], predicate func(T, K) E, constructor DictionaryConstructor[T, E]) IDictionary[T, E] {
-	return MapToDictionary(c.Collect(), predicate, constructor)
+func IDictionaryMap[T comparable, K, E any, ID IDictionary[T, K], OD IDictionary[T, E]](c ID, predicate func(T, K) E, constructor DictionaryConstructor[T, E, OD]) OD {
+	return MapToIDictionary(c.Collect(), predicate, constructor)
 }
 
-// MapToDictionary creates a new Dictionary by applying the provided predicate function to each key-value pair in the provided map.
-// The predicate function is applied to each key and value, and its result is used as the new value in the returned Dictionary.
+// MapToIDictionary creates a new Dictionary by applying the provided predicate function to each key-value pair in the provided map.
+// The predicate function is applied to each key and value, and its result is used as the new value in the returned IDictionary.
 //
 // Parameters:
 //   - c: A map[T]K from which the key-value pairs will be transformed.
@@ -61,9 +61,9 @@ func DictionaryMap[T comparable, K, E any](c IDictionary[T, K], predicate func(T
 // Example usage:
 //
 //	dict := map[string]int{"a": 1, "b": 2}
-//	newDict := MapToDictionary(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) })
+//	newDict := MapToIDictionary(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) }, MakeDictionary)
 //	// newDict will contain {"a": "1", "b": "2"}, where the values are transformed to strings
-func MapToDictionary[T comparable, K, E any](c map[T]K, predicate func(T, K) E, constructor DictionaryConstructor[T, E]) IDictionary[T, E] {
+func MapToIDictionary[T comparable, K, E any, OD IDictionary[T, E]](c map[T]K, predicate func(T, K) E, constructor DictionaryConstructor[T, E, OD]) OD {
 	mapped := map[T]E{}
 	for key, item := range c {
 		mapped[key] = predicate(key, item)
