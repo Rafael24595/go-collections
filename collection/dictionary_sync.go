@@ -592,7 +592,7 @@ func (c *DictionarySync[T, K]) Collect() map[T]K {
 //	newDict := DictionaryMap(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) })
 //	// newDict will contain {"a": "1", "b": "2"}, where the values are transformed to strings
 func DictionarySyncMap[T comparable, K, E any](c IDictionary[T, K], predicate func(T, K) E) IDictionary[T, E] {
-	return MapToDictionary(c.Collect(), predicate)
+	return MapToDictionarySync(c.Collect(), predicate)
 }
 
 // MapToDictionary creates a new DictionarySync by applying the provided predicate function to each key-value pair in the provided map.
