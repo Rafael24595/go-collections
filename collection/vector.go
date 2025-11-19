@@ -709,7 +709,7 @@ func (c *Vector[T]) Page(page, size int) *Vector[T] {
 //	vec := VectorFromList([]int{1, 2, 3, 4})
 //	transformed := VectorMap(vec, func(v int) string { return fmt.Sprintf("Item %d", v) })
 //	// transformed will be a new Vector with elements: ["Item 1", "Item 2", "Item 3", "Item 4"]
-func VectorMap[T, K any](c *Vector[T], predicate func(T) K, constructor VectorConstructor[K]) IVector[K] {
+func VectorMap[T, K any](c IVector[T], predicate func(T) K, constructor VectorConstructor[K]) IVector[K] {
 	return MapToVector(c.Collect(), predicate)
 }
 
@@ -718,7 +718,7 @@ func VectorMap[T, K any](c *Vector[T], predicate func(T) K, constructor VectorCo
 // a Vector with the transformed elements.
 //
 // Parameters:
-//   - c: The source IVector containing elements of type T.
+//   - c: The source slice containing elements of type T.
 //   - predicate: A function that takes an element of type T and transforms it into an element of type K.
 //
 // Returns:
@@ -726,8 +726,8 @@ func VectorMap[T, K any](c *Vector[T], predicate func(T) K, constructor VectorCo
 //
 // Example usage:
 //
-//	vec := VectorFromList([]int{1, 2, 3, 4})
-//	transformed := MapToVector(vec, func(v int) string { return fmt.Sprintf("Item %d", v) })
+//	slc := []int{1, 2, 3, 4}
+//	transformed := MapToVector(slc, func(v int) string { return fmt.Sprintf("Item %d", v) })
 //	// transformed will be a new Vector with elements: ["Item 1", "Item 2", "Item 3", "Item 4"]
 func MapToVector[T, K any](c []T, predicate func(T) K) IVector[K] {
 	return MapToIVector(c, predicate, MakeVector)
