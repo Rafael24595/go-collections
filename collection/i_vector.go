@@ -60,7 +60,7 @@ func IVectorMap[T, K any](c *Vector[T], predicate func(T) K, constructor VectorC
 // a IVector with the transformed elements.
 //
 // Parameters:
-//   - c: The source IVector containing elements of type T.
+//   - c: The source slice containing elements of type T.
 //   - predicate: A function that takes an element of type T and transforms it into an element of type K.
 //   - constructor: A function that instance a new IVector implementation, and return it with the mapped values.
 //
@@ -69,8 +69,8 @@ func IVectorMap[T, K any](c *Vector[T], predicate func(T) K, constructor VectorC
 //
 // Example usage:
 //
-//	vec := VectorFromList([]int{1, 2, 3, 4})
-//	transformed := MapToIVector(vec, func(v int) string { return fmt.Sprintf("Item %d", v) }, MakeVector)
+//	slc := []int{1, 2, 3, 4}
+//	transformed := MapToIVector(slc, func(v int) string { return fmt.Sprintf("Item %d", v) }, MakeVector)
 //	// transformed will be a new Vector with elements: ["Item 1", "Item 2", "Item 3", "Item 4"]
 func MapToIVector[T, K any](c []T, predicate func(T) K, constructor VectorConstructor[K]) IVector[K] {
 	mapped := make([]K, len(c))

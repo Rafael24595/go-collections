@@ -613,3 +613,44 @@ func DictionarySyncMap[T comparable, K, E any](c IDictionary[T, K], predicate fu
 func MapToDictionarySync[T comparable, K, E any](c map[T]K, predicate func(T, K) E) IDictionary[T, E] {
 	return MapToIDictionary(c, predicate, MakeDictionarySync)
 }
+
+// VectorMapToDictionarySync applies the given predicate function to each element in the IVector,
+// transforming each element of type T into an tuple of types E, that implements comparable, and K, then returns
+// a new DictionarySync with the transformed elements.
+//
+// Parameters:
+//   - c: The source IVector containing elements of type T.
+//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//
+// Returns:
+//   - A new IDictionary[E, K] where the keys remain the same, but the values are the result of applying the predicate function.
+//
+// Example usage:
+//
+//	vec := VectorFromList([]int{1, 2, 3, 4})
+//	transformed := VectorMapToDictionarySync(vec, func(v int) (string, int) { return fmt.Sprintf("Item %d", v), v })
+//	// transformed will be a new Vector with elements: {"Item 1": 1, "Item 2": 2, "Item 3": 3, "Item 4": 4}
+func VectorMapToDictionarySync[T, K any, E comparable](c IVector[T], predicate func(T) (E, K)) IDictionary[E, K] {
+	return ListMapToDictionarySync(c.Collect(), predicate)
+}
+
+// ListMapToDictionarySync applies the given predicate function to each element in the slice,
+// transformng each element of type T into an tuple of types E, that implements comparable, and K, then returns
+// a new DictionarySync with the transformed elements.
+//
+// Parameters:
+//   - c: The slice IVector containing elements of type T.
+//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//
+// Returns:
+//   - A new IDictionary[E, K] where the keys remain the same, but the values are the result of applying the predicate function.
+//
+// Example usage:
+//
+//	slc := []int{1, 2, 3, 4}
+//	transformed := ListMapToDictionarySync(slc, func(v int) (string, int) { return fmt.Sprintf("Item %d", v), v })
+//	// transformed will be a new Vector with elements: {"Item 1": 1, "Item 2": 2, "Item 3": 3, "Item 4": 4}
+func ListMapToDictionarySync[T, K any, E comparable](c []T, predicate func(T) (E, K)) IDictionary[E, K] {
+	return ListMapToIDictionary(c, predicate, MakeDictionarySync)
+}
+

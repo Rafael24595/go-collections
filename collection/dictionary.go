@@ -20,7 +20,7 @@ type Dictionary[T comparable, K any] struct {
 }
 
 // MakeDictionary creates a new Dictionary from a given map.
-// It takes a map with keys of type T and values of type K and 
+// It takes a map with keys of type T and values of type K and
 // returns a pointer to a IDictionary containing the same items.
 //
 // T must be a comparable type to be used as a map key.
@@ -36,7 +36,7 @@ func MakeDictionary[T comparable, K any](items map[T]K) IDictionary[T, K] {
 }
 
 // DictionaryFromMap creates a new Dictionary from a given map.
-// It takes a map with keys of type T and values of type K and 
+// It takes a map with keys of type T and values of type K and
 // returns a pointer to a Dictionary containing the same items.
 //
 // T must be a comparable type to be used as a map key.
@@ -95,7 +95,7 @@ func DictionaryFromVector[T comparable, K any](vector Vector[K], mapper func(K) 
 //
 // Example usage:
 //     list := []int{10, 20, 30}
-//     dict := DictionaryFromList(list, func(i int) string { return fmt.Sprintf("key-%d", i) 
+//     dict := DictionaryFromList(list, func(i int) string { return fmt.Sprintf("key-%d", i)
 func DictionaryFromList[T comparable, K any](vector []K, mapper func(K) T) *Dictionary[T, K] {
 	mapp := DictionaryEmpty[T, K]()
 	for _, v := range vector {
@@ -491,7 +491,7 @@ func (c Dictionary[T, K]) ValuesVector() *Vector[K] {
 //
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
-//     pairs := dict.Pairs() 
+//     pairs := dict.Pairs()
 //     // pairs will contain [{a 1}, {b 2}, {c 3}], where each Pair holds a key-value pair
 func (c *Dictionary[T, K]) Pairs() []Pair[T, K] {
 	pairs := make([]Pair[T, K], 0, len(c.items))
@@ -549,4 +549,44 @@ func DictionaryMap[T comparable, K, E any](c IDictionary[T, K], predicate func(T
 //	// newDict will contain {"a": "1", "b": "2"}, where the values are transformed to strings
 func MapToDictionary[T comparable, K, E any](c map[T]K, predicate func(T, K) E) IDictionary[T, E] {
 	return MapToIDictionary(c, predicate, MakeDictionary)
+}
+
+// VectorMapToDictionary applies the given predicate function to each element in the IVector,
+// transforming each element of type T into an tuple of types E, that implements comparable, and K, then returns
+// a new Dictionary with the transformed elements.
+//
+// Parameters:
+//   - c: The source IVector containing elements of type T.
+//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//
+// Returns:
+//   - A new IDictionary[E, K] where the keys remain the same, but the values are the result of applying the predicate function.
+//
+// Example usage:
+//
+//	vec := VectorFromList([]int{1, 2, 3, 4})
+//	transformed := VectorMapToDictionary(vec, func(v int) (string, int) { return fmt.Sprintf("Item %d", v), v })
+//	// transformed will be a new Vector with elements: {"Item 1": 1, "Item 2": 2, "Item 3": 3, "Item 4": 4}
+func VectorMapToDictionary[T, K any, E comparable](c IVector[T], predicate func(T) (E, K)) IDictionary[E, K] {
+	return ListMapToDictionary(c.Collect(), predicate)
+}
+
+// ListMapToDictionary applies the given predicate function to each element in the slice,
+// transformng each element of type T into an tuple of types E, that implements comparable, and K, then returns
+// a new Dictionary with the transformed elements.
+//
+// Parameters:
+//   - c: The slice IVector containing elements of type T.
+//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//
+// Returns:
+//   - A new IDictionary[E, K] where the keys remain the same, but the values are the result of applying the predicate function.
+//
+// Example usage:
+//
+//	slc := []int{1, 2, 3, 4}
+//	transformed := ListMapToDictionary(slc, func(v int) (string, int) { return fmt.Sprintf("Item %d", v), v })
+//	// transformed will be a new Vector with elements: {"Item 1": 1, "Item 2": 2, "Item 3": 3, "Item 4": 4}
+func ListMapToDictionary[T, K any, E comparable](c []T, predicate func(T) (E, K)) IDictionary[E, K] {
+	return ListMapToIDictionary(c, predicate, MakeDictionary)
 }
