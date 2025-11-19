@@ -70,3 +70,52 @@ func MapToIDictionary[T comparable, K, E any, OD IDictionary[T, E]](c map[T]K, p
 	}
 	return constructor(mapped)
 }
+
+// VectorMapToIDictionary applies the given predicate function to each element in the IVector,
+// transforming each element of type T into an tuple of types E, that implements comparable, and K, then returns
+// a new IDictionary with the transformed elements.
+//
+// Parameters:
+//   - c: The source IVector containing elements of type T.
+//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//   - constructor: A function that instance a new IDictionary implementation, and return it with the mapped values.
+//
+// Returns:
+//   - A new IDictionary[E, K] where the keys remain the same, but the values are the result of applying the predicate function.
+//
+// Example usage:
+//
+//	vec := VectorFromList([]int{1, 2, 3, 4})
+//	transformed := VectorMapToIDictionary(vec, func(v int) (string, int) { return fmt.Sprintf("Item %d", v), v }, MakeDictionary)
+//	// transformed will be a new Vector with elements: {"Item 1": 1, "Item 2": 2, "Item 3": 3, "Item 4": 4}
+func VectorMapToIDictionary[T, K any, E comparable, OD IDictionary[E, K]](c IVector[T], predicate func(T) (E, K), constructor DictionaryConstructor[E, K, OD]) IDictionary[E, K] {
+	return ListMapToIDictionary(c.Collect(), predicate, constructor)
+}
+
+// ListMapToIDictionary applies the given predicate function to each element in the slice,
+// transformng each element of type T into an tuple of types E, that implements comparable, and K, then returns
+// a new IDictionary with the transformed elements.
+//
+// Parameters:
+//   - c: The slice IVector containing elements of type T.
+//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//   - constructor: A function that instance a new IDictionary implementation, and return it with the mapped values.
+//
+// Returns:
+//   - A new IDictionary[E, K] where the keys remain the same, but the values are the result of applying the predicate function.
+//
+// Example usage:
+//
+//	slc := []int{1, 2, 3, 4}
+//	transformed := ListMapToIDictionary(slc, func(v int) (string, int) { return fmt.Sprintf("Item %d", v), v }, MakeDictionary)
+//	// transformed will be a new Vector with elements: {"Item 1": 1, "Item 2": 2, "Item 3": 3, "Item 4": 4}
+func ListMapToIDictionary[T, K any, E comparable, OD IDictionary[E, K]](c []T, predicate func(T) (E, K), constructor DictionaryConstructor[E, K, OD]) IDictionary[E, K] {
+	m := make(map[E]K, 0)
+
+	for _, v := range c {
+		e, k := predicate(v)
+		m[e] = k
+	}
+
+	return constructor(m)
+}
