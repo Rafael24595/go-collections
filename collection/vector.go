@@ -645,7 +645,7 @@ func (c *Vector[T]) Join(separator string) string {
 	}
 	return VectorMap(c, func(i T) string {
 		return fmt.Sprintf("%v", i)
-	}, MakeVector).Join(separator)
+	}).Join(separator)
 }
 
 // Pages calculates the number of pages required to hold all the elements of the Vector,
@@ -709,7 +709,7 @@ func (c *Vector[T]) Page(page, size int) *Vector[T] {
 //	vec := VectorFromList([]int{1, 2, 3, 4})
 //	transformed := VectorMap(vec, func(v int) string { return fmt.Sprintf("Item %d", v) })
 //	// transformed will be a new Vector with elements: ["Item 1", "Item 2", "Item 3", "Item 4"]
-func VectorMap[T, K any](c IVector[T], predicate func(T) K, constructor VectorConstructor[K]) IVector[K] {
+func VectorMap[T, K any](c IVector[T], predicate func(T) K) IVector[K] {
 	return MapToVector(c.Collect(), predicate)
 }
 
