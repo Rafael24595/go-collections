@@ -1,46 +1,48 @@
 package collection
 
-type VectorConstructor[T any] func([]T) IVector[T]
+type VectorConstructor[I any] func([]I) IVector[I]
 
-type IVector[T any] interface {
+type IVector[I any] interface {
 	Size() int
-	Contains(predicate func(T) bool) bool
-	IndexOf(predicate func(T) bool) int
-	Find(predicate func(T) bool) []T
-	FindOne(predicate func(T) bool) (*T, bool)
-	Get(index int) (*T, bool)
-	First() (*T, bool)
-	Last() (*T, bool)
-	Append(items ...T) *Vector[T]
-	Set(index int, item T) (*T, bool)
-	AppendIfAbsent(predicate func(T, T) bool, items ...T) *Vector[T]
-	Merge(other Vector[T]) *Vector[T]
-	Filter(predicate func(T) bool) *Vector[T]
-	FilterSelf(predicate func(T) bool) *Vector[T]
-	Remove(index int) (*T, bool)
-	Slice(start, end int) *Vector[T]
-	SliceSelf(start, end int) *Vector[T]
-	Unshift(items ...T) *Vector[T]
-	Shift() (*T, bool)
-	JoinBy(indexer func(T) string, predicate func(i, j T) T) *Vector[T]
-	ForEach(predicate func(int, T)) *Vector[T]
-	Map(predicate func(int, T) T) *Vector[T]
-	Clean() *Vector[T]
-	Clone() *Vector[T]
-	Sort(less func(i, j T) bool) *Vector[T]
-	Collect() []T
+	Contains(predicate func(I) bool) bool
+	IndexOf(predicate func(I) bool) int
+	Find(predicate func(I) bool) []I
+	FindOne(predicate func(I) bool) (I, bool)
+	Get(index int) (I, bool)
+	First() (I, bool)
+	Last() (I, bool)
+	Append(items ...I) *Vector[I]
+	Set(index int, item I) (I, bool)
+	AppendIfAbsent(predicate func(I, I) bool, items ...I) *Vector[I]
+	Merge(other Vector[I]) *Vector[I]
+	Filter(predicate func(I) bool) *Vector[I]
+	FilterSelf(predicate func(I) bool) *Vector[I]
+	Remove(index int) (I, bool)
+	Slice(start, end int) *Vector[I]
+	SliceSelf(start, end int) *Vector[I]
+	Unshift(items ...I) *Vector[I]
+	Shift() (I, bool)
+	JoinBy(indexer func(I) string, predicate func(i, j I) I) *Vector[I]
+	ForEach(predicate func(int, I)) *Vector[I]
+	Map(predicate func(int, I) I) *Vector[I]
+	Clean() *Vector[I]
+	Clone() *Vector[I]
+	Sort(less func(i, j I) bool) *Vector[I]
+	Max(predicate func(I) int) (I, int, bool)
+	Min(predicate func(I) int) (I, int, bool)
+	Collect() []I
 	Join(separator string) string
 	Pages(size int) int
-	Page(page, size int) *Vector[T]
+	Page(page, size int) *Vector[I]
 }
 
 // IVectorMap applies the given predicate function to each element in the IVector,
-// transforming each element of type T into an element of type K, and returns
+// transforming each element of type I into an element of type K, and returns
 // a new Vector with the transformed elements.
 //
 // Parameters:
-//   - c: The source IVector containing elements of type T.
-//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//   - c: The source IVector containing elements of type I.
+//   - predicate: A function that takes an element of type I and transforms it into an element of type K.
 //   - constructor: A function that instance a new IVector implementation, and return it with the mapped values.
 //
 // Returns:
@@ -51,17 +53,17 @@ type IVector[T any] interface {
 //	vec := VectorFromList([]int{1, 2, 3, 4})
 //	transformed := IVectorMap(vec, func(v int) string { return fmt.Sprintf("Item %d", v) }, MakeVector)
 //	// transformed will be a new Vector with elements: ["Item 1", "Item 2", "Item 3", "Item 4"]
-func IVectorMap[T, K any](c *Vector[T], predicate func(T) K, constructor VectorConstructor[K]) IVector[K] {
+func IVectorMap[I, K any](c *Vector[I], predicate func(I) K, constructor VectorConstructor[K]) IVector[K] {
 	return MapToIVector(c.Collect(), predicate, constructor)
 }
 
 // MapToVector applies the given predicate function to each element in the slice,
-// transforming each element of type T into an element of type K, and returns
+// transforming each element of type I into an element of type K, and returns
 // a IVector with the transformed elements.
 //
 // Parameters:
-//   - c: The source slice containing elements of type T.
-//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//   - c: The source slice containing elements of type I.
+//   - predicate: A function that takes an element of type I and transforms it into an element of type K.
 //   - constructor: A function that instance a new IVector implementation, and return it with the mapped values.
 //
 // Returns:
@@ -72,7 +74,7 @@ func IVectorMap[T, K any](c *Vector[T], predicate func(T) K, constructor VectorC
 //	slc := []int{1, 2, 3, 4}
 //	transformed := MapToIVector(slc, func(v int) string { return fmt.Sprintf("Item %d", v) }, MakeVector)
 //	// transformed will be a new Vector with elements: ["Item 1", "Item 2", "Item 3", "Item 4"]
-func MapToIVector[T, K any](c []T, predicate func(T) K, constructor VectorConstructor[K]) IVector[K] {
+func MapToIVector[I, K any](c []I, predicate func(I) K, constructor VectorConstructor[K]) IVector[K] {
 	mapped := make([]K, len(c))
 	for i, item := range c {
 		mapped[i] = predicate(item)
