@@ -1,103 +1,103 @@
 package collection
 
-// Dictionary is a generic key-value store where each key is of type T and each value is of type K.
+// Dictionary is a generic key-value store where each key is of type K and each value is of type V.
 // The Dictionary provides methods to manipulate and interact with key-value pairs efficiently, including
 // operations like adding, removing, and transforming pairs.
 //
 // Type parameters:
-//   - T: The type of the keys in the Dictionary. The keys must be comparable.
-//   - K: The type of the values in the Dictionary.
+//   - K: The type of the keys in the Dictionary. The keys must be comparable.
+//   - V: The type of the values in the Dictionary.
 //
 // Fields:
-//   - items: A map storing the actual key-value pairs. The keys are of type T, and the values are of type K.
+//   - items: A map storing the actual key-value pairs. The keys are of type K, and the values are of type V.
 //
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     dict.Put("c", 3)
 //     value, exists := dict.Get("a") // value will be 1, exists will be true
-type Dictionary[T comparable, K any] struct {
-	items map[T]K
+type Dictionary[K comparable, V any] struct {
+	items map[K]V
 }
 
 // MakeDictionary creates a new Dictionary from a given map.
-// It takes a map with keys of type T and values of type K and
+// It takes a map with keys of type K and values of type V and
 // returns a pointer to a IDictionary containing the same items.
 //
-// T must be a comparable type to be used as a map key.
-// K can be any type.
+// K must be a comparable type to be used as a map key.
+// V can be any type.
 //
 // Example usage:
 //     myMap := map[string]int{"a": 1, "b": 2}
 //     dict := MakeDictionary(myMap)
-func MakeDictionary[T comparable, K any](items map[T]K) IDictionary[T, K] {
-	return &Dictionary[T, K]{
+func MakeDictionary[K comparable, V any](items map[K]V) IDictionary[K, V] {
+	return &Dictionary[K, V]{
 		items,
 	}
 }
 
 // DictionaryFromMap creates a new Dictionary from a given map.
-// It takes a map with keys of type T and values of type K and
+// It takes a map with keys of type K and values of type V and
 // returns a pointer to a Dictionary containing the same items.
 //
-// T must be a comparable type to be used as a map key.
-// K can be any type.
+// K must be a comparable type to be used as a map key.
+// V can be any type.
 //
 // Example usage:
 //     myMap := map[string]int{"a": 1, "b": 2}
 //     dict := DictionaryFromMap(myMap)
-func DictionaryFromMap[T comparable, K any](items map[T]K) *Dictionary[T, K] {
-	return &Dictionary[T, K]{
+func DictionaryFromMap[K comparable, V any](items map[K]V) *Dictionary[K, V] {
+	return &Dictionary[K, V]{
 		items,
 	}
 }
 
 // DictionaryEmpty creates and returns a new, empty Dictionary.
 //
-// T must be a comparable type to be used as a map key.
-// K can be any type.
+// K must be a comparable type to be used as a map key.
+// V can be any type.
 //
 // Example usage:
 //     emptyDict := DictionaryEmpty[string, int]()
-func DictionaryEmpty[T comparable, K any]() *Dictionary[T, K] {
-	return DictionaryFromMap(make(map[T]K))
+func DictionaryEmpty[K comparable, V any]() *Dictionary[K, V] {
+	return DictionaryFromMap(make(map[K]V))
 }
 
 // DictionaryFromVector creates a Dictionary from a Vector by applying a mapping function.
 //
-// T must be a comparable type to be used as a dictionary key.
-// K can be any type.
+// K must be a comparable type to be used as a dictionary key.
+// V can be any type.
 //
 // Parameters:
-//   - vector: A Vector containing values of type K.
-//   - mapper: A function that converts a value of type K into a key of type T.
+//   - vector: A Vector containing values of type V.
+//   - mapper: A function that converts a value of type V into a key of type K.
 //
 // Returns:
-//   - A pointer to a Dictionary[T, K].
+//   - A pointer to a Dictionary[K, V].
 //
 // Example usage:
 //     vec := VectorFromList([]int{10, 20, 30})
 //     dict := DictionaryFromVector(vec, func(i int) string { return fmt.Sprintf("key-%d", i) })
-func DictionaryFromVector[T comparable, K any](vector Vector[K], mapper func(K) T) *Dictionary[T, K] {
+func DictionaryFromVector[K comparable, V any](vector Vector[V], mapper func(V) K) *Dictionary[K, V] {
 	return DictionaryFromList(vector.items, mapper)
 }
 
 // DictionaryFromList creates a Dictionary from a slice by applying a mapping function.
 //
-// T must be a comparable type to be used as a dictionary key.
-// K can be any type.
+// K must be a comparable type to be used as a dictionary key.
+// V can be any type.
 //
 // Parameters:
-//   - vector: A slice of values of type K.
-//   - mapper: A function that converts a value of type K into a key of type T.
+//   - vector: A slice of values of type V.
+//   - mapper: A function that converts a value of type V into a key of type K.
 //
 // Returns:
-//   - A pointer to a Dictionary[T, K] containing the mapped key-value pairs.
+//   - A pointer to a Dictionary[K, V] containing the mapped key-value pairs.
 //
 // Example usage:
 //     list := []int{10, 20, 30}
 //     dict := DictionaryFromList(list, func(i int) string { return fmt.Sprintf("key-%d", i)
-func DictionaryFromList[T comparable, K any](vector []K, mapper func(K) T) *Dictionary[T, K] {
-	mapp := DictionaryEmpty[T, K]()
+func DictionaryFromList[K comparable, V any](vector []V, mapper func(V) K) *Dictionary[K, V] {
+	mapp := DictionaryEmpty[K, V]()
 	for _, v := range vector {
 		mapp.Put(mapper(v), v)
 	}
@@ -112,14 +112,14 @@ func DictionaryFromList[T comparable, K any](vector []K, mapper func(K) T) *Dict
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     size := dict.Size() // size will be 2
-func (c *Dictionary[T, K]) Size() int {
+func (c *Dictionary[K, V]) Size() int {
 	return len(c.items)
 }
 
 // Exists checks if the given key exists in the Dictionary.
 //
 // Parameters:
-//   - key: The key of type T to check for in the Dictionary.
+//   - key: The key of type K to check for in the Dictionary.
 //
 // Returns:
 //   - A boolean indicating whether the key exists in the Dictionary.
@@ -128,7 +128,7 @@ func (c *Dictionary[T, K]) Size() int {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     exists := dict.Exists("a") // exists will be true
 //     exists = dict.Exists("c")  // exists will be false
-func (c *Dictionary[T, K]) Exists(key T) bool {
+func (c *Dictionary[K, V]) Exists(key K) bool {
 	_, exists := c.items[key]
 	return exists
 }
@@ -136,18 +136,18 @@ func (c *Dictionary[T, K]) Exists(key T) bool {
 // Find returns a slice of values from the Dictionary that satisfy the given predicate function.
 //
 // Parameters:
-//   - predicate: A function that takes a key of type T and a value of type K, and returns a boolean.
+//   - predicate: A function that takes a key of type K and a value of type V, and returns a boolean.
 //                The function should return true for the values that should be included in the result.
 //
 // Returns:
-//   - A slice of values of type K that satisfy the predicate function.
+//   - A slice of values of type V that satisfy the predicate function.
 //
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     result := dict.Find(func(k string, v int) bool { return v > 1 })
 //     // result will be [2, 3]
-func (c *Dictionary[T, K]) Find(predicate func(T, K) bool) []K {
-	filter := []K{}
+func (c *Dictionary[K, V]) Find(predicate func(K, V) bool) []V {
+	filter := []V{}
 	for k, v := range c.items {
 		if predicate(k, v) {
 			filter = append(filter, v)
@@ -159,11 +159,11 @@ func (c *Dictionary[T, K]) Find(predicate func(T, K) bool) []K {
 // FindOne searches for the first key-value pair in the Dictionary that satisfies the given predicate function.
 //
 // Parameters:
-//   - predicate: A function that takes a key of type T and a value of type K, and returns a boolean.
+//   - predicate: A function that takes a key of type K and a value of type V, and returns a boolean.
 //                The function should return true for the first pair that matches the search criteria.
 //
 // Returns:
-//   - A pointer to the value of type K if a matching key-value pair is found, or nil if not found.
+//   - A pointer to the value of type V if a matching key-value pair is found, or nil if not found.
 //   - A boolean indicating whether a match was found (true if found, false otherwise).
 //
 // Example usage:
@@ -172,32 +172,33 @@ func (c *Dictionary[T, K]) Find(predicate func(T, K) bool) []K {
 //     // value will be a pointer to 2, found will be true
 //     value, found = dict.FindOne(func(k string, v int) bool { return v == 4 })
 //     // value will be nil, found will be false
-func (c *Dictionary[T, K]) FindOne(predicate func(T, K) bool) (*K, bool) {
+func (c *Dictionary[K, V]) FindOne(predicate func(K, V) bool) (V, bool) {
 	for k, v := range c.items {
 		if predicate(k, v) {
-			return &v, true
+			return v, true
 		}
 	}
-	return nil, false
+	var zero V
+	return zero, false
 }
 
 // Get retrieves the value associated with the given key in the Dictionary.
 // It returns a pointer to the value if the key exists, and a boolean indicating whether the key was found.
 //
 // Parameters:
-//   - key: The key of type T whose associated value is to be retrieved.
+//   - key: The key of type K whose associated value is to be retrieved.
 //
 // Returns:
-//   - A pointer to the value of type K associated with the key, or nil if the key does not exist.
+//   - A pointer to the value of type V associated with the key, or nil if the key does not exist.
 //   - A boolean indicating whether the key was found in the Dictionary (true if found, false otherwise).
 //
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     value, found := dict.Get("a") // value will be a pointer to 1, found will be true
 //     value, found = dict.Get("c")  // value will be nil, found will be false
-func (c *Dictionary[T, K]) Get(key T) (*K, bool) {
+func (c *Dictionary[K, V]) Get(key K) (V, bool) {
 	value, exists := c.items[key]
-	return &value, exists
+	return value, exists
 }
 
 // Put adds a key-value pair to the Dictionary, updating the value if the key already exists.
@@ -205,8 +206,8 @@ func (c *Dictionary[T, K]) Get(key T) (*K, bool) {
 // the key already existed in the Dictionary (true if it existed, false otherwise).
 //
 // Parameters:
-//   - key: The key of type T to associate with the given value.
-//   - item: The value of type K to be associated with the key.
+//   - key: The key of type K to associate with the given value.
+//   - item: The value of type V to be associated with the key.
 //
 // Returns:
 //   - A pointer to the old value associated with the key, or nil if the key did not exist.
@@ -216,7 +217,7 @@ func (c *Dictionary[T, K]) Get(key T) (*K, bool) {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     oldValue, exists := dict.Put("a", 3) // oldValue will be a pointer to 1, exists will be true
 //     oldValue, exists = dict.Put("c", 4)  // oldValue will be nil, exists will be false
-func (c *Dictionary[T, K]) Put(key T, item K) (*K, bool) {
+func (c *Dictionary[K, V]) Put(key K, item V) (V, bool) {
 	old, exists := c.Get(key)
 	c.items[key] = item
 	return old, exists
@@ -227,8 +228,8 @@ func (c *Dictionary[T, K]) Put(key T, item K) (*K, bool) {
 // along with a boolean indicating that the key was already present.
 //
 // Parameters:
-//   - key: The key of type T to associate with the given value.
-//   - item: The value of type K to be associated with the key if the key is absent.
+//   - key: The key of type K to associate with the given value.
+//   - item: The value of type V to be associated with the key if the key is absent.
 //
 // Returns:
 //   - A pointer to the old value associated with the key, or nil if the key was not found.
@@ -238,7 +239,7 @@ func (c *Dictionary[T, K]) Put(key T, item K) (*K, bool) {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     oldValue, exists := dict.PutIfAbsent("a", 3) // oldValue will be a pointer to 1, exists will be true
 //     oldValue, exists = dict.PutIfAbsent("c", 4)  // oldValue will be nil, exists will be false
-func (c *Dictionary[T, K]) PutIfAbsent(key T, item K) (*K, bool) {
+func (c *Dictionary[K, V]) PutIfAbsent(key K, item V) (V, bool) {
 	old, exists := c.Get(key)
 	if !exists {
 		c.Put(key, item)
@@ -250,7 +251,7 @@ func (c *Dictionary[T, K]) PutIfAbsent(key T, item K) (*K, bool) {
 // overwriting any existing values for the keys that already exist in the Dictionary.
 //
 // Parameters:
-//   - items: A map of type map[T]K containing the key-value pairs to add to the Dictionary.
+//   - items: A map of type map[K]V containing the key-value pairs to add to the Dictionary.
 //
 // Returns:
 //   - The Dictionary itself, with all the new key-value pairs added.
@@ -259,7 +260,7 @@ func (c *Dictionary[T, K]) PutIfAbsent(key T, item K) (*K, bool) {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     otherMap := map[string]int{"b": 3, "c": 4}
 //     dict.PutAll(otherMap) // dict will contain {"a": 1, "b": 3, "c": 4}
-func (c *Dictionary[T, K]) PutAll(items map[T]K) IDictionary[T, K] {
+func (c *Dictionary[K, V]) PutAll(items map[K]V) IDictionary[K, V] {
 	for key := range items {
 		c.items[key] = items[key]
 	}
@@ -270,7 +271,7 @@ func (c *Dictionary[T, K]) PutAll(items map[T]K) IDictionary[T, K] {
 // overwriting any existing values for the keys that already exist.
 //
 // Parameters:
-//   - other: A Dictionary of type Dictionary[T, K] to merge into the current Dictionary.
+//   - other: A Dictionary of type Dictionary[K, V] to merge into the current Dictionary.
 //
 // Returns:
 //   - The Dictionary itself, with the key-value pairs from the other Dictionary added.
@@ -279,7 +280,7 @@ func (c *Dictionary[T, K]) PutAll(items map[T]K) IDictionary[T, K] {
 //     dict1 := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     dict2 := DictionaryFromMap(map[string]int{"b": 3, "c": 4})
 //     dict1.Merge(dict2) // dict1 will contain {"a": 1, "b": 3, "c": 4}
-func (c *Dictionary[T, K]) Merge(other IDictionary[T, K]) IDictionary[T, K] {
+func (c *Dictionary[K, V]) Merge(other IDictionary[K, V]) IDictionary[K, V] {
 	return c.PutAll(other.Collect())
 }
 
@@ -288,7 +289,7 @@ func (c *Dictionary[T, K]) Merge(other IDictionary[T, K]) IDictionary[T, K] {
 // those that satisfy the condition defined in the predicate.
 //
 // Parameters:
-//   - predicate: A function that takes a key of type T and a value of type K, and returns a boolean.
+//   - predicate: A function that takes a key of type K and a value of type V, and returns a boolean.
 //                The function should return true for the key-value pairs that should be kept in the result.
 //
 // Returns:
@@ -298,8 +299,8 @@ func (c *Dictionary[T, K]) Merge(other IDictionary[T, K]) IDictionary[T, K] {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     filtered := dict.Filter(func(k string, v int) bool { return v > 1 })
 //     // filtered will contain {"b": 2, "c": 3}
-func (c *Dictionary[T, K]) Filter(predicate func(T, K) bool) IDictionary[T, K] {
-	filter := map[T]K{}
+func (c *Dictionary[K, V]) Filter(predicate func(K, V) bool) IDictionary[K, V] {
+	filter := map[K]V{}
 	for key, v := range c.items {
 		if predicate(key, v) {
 			filter[key] = v
@@ -312,7 +313,7 @@ func (c *Dictionary[T, K]) Filter(predicate func(T, K) bool) IDictionary[T, K] {
 // It updates the Dictionary itself, removing key-value pairs that do not satisfy the condition defined in the predicate.
 //
 // Parameters:
-//   - predicate: A function that takes a key of type T and a value of type K, and returns a boolean.
+//   - predicate: A function that takes a key of type K and a value of type V, and returns a boolean.
 //                The function should return true for the key-value pairs that should be retained in the Dictionary.
 //
 // Returns:
@@ -322,8 +323,8 @@ func (c *Dictionary[T, K]) Filter(predicate func(T, K) bool) IDictionary[T, K] {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     dict.FilterSelf(func(k string, v int) bool { return v > 1 })
 //     // dict will contain {"b": 2, "c": 3}
-func (c *Dictionary[T, K]) FilterSelf(predicate func(T, K) bool) IDictionary[T, K] {
-	filter := map[T]K{}
+func (c *Dictionary[K, V]) FilterSelf(predicate func(K, V) bool) IDictionary[K, V] {
+	filter := map[K]V{}
 	for key, v := range c.items {
 		if predicate(key, v) {
 			filter[key] = v
@@ -338,7 +339,7 @@ func (c *Dictionary[T, K]) FilterSelf(predicate func(T, K) bool) IDictionary[T, 
 // indicating whether the key was found and removed from the Dictionary.
 //
 // Parameters:
-//   - key: The key of type T to remove from the Dictionary.
+//   - key: The key of type K to remove from the Dictionary.
 //
 // Returns:
 //   - A pointer to the old value associated with the key, or nil if the key was not found.
@@ -348,7 +349,7 @@ func (c *Dictionary[T, K]) FilterSelf(predicate func(T, K) bool) IDictionary[T, 
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     oldValue, exists := dict.Remove("a", 1) // oldValue will be a pointer to 1, exists will be true
 //     oldValue, exists = dict.Remove("c", 3)  // oldValue will be nil, exists will be false
-func (c *Dictionary[T, K]) Remove(key T) (*K, bool) {
+func (c *Dictionary[K, V]) Remove(key K) (V, bool) {
 	old, exists := c.Get(key)
 	delete(c.items, key)
 	return old, exists
@@ -358,7 +359,7 @@ func (c *Dictionary[T, K]) Remove(key T) (*K, bool) {
 // The predicate is called with each key and value, allowing side effects or custom actions for every entry in the Dictionary.
 //
 // Parameters:
-//   - predicate: A function that takes a key of type T and a value of type K, and performs an action or operation.
+//   - predicate: A function that takes a key of type K and a value of type V, and performs an action or operation.
 //
 // Returns:
 //   - The Dictionary itself, allowing for method chaining.
@@ -369,7 +370,7 @@ func (c *Dictionary[T, K]) Remove(key T) (*K, bool) {
 //     // Output:
 //     // a 1
 //     // b 2
-func (c *Dictionary[T, K]) ForEach(predicate func(T, K)) IDictionary[T, K] {
+func (c *Dictionary[K, V]) ForEach(predicate func(K, V)) IDictionary[K, V] {
 	for k, v := range c.items {
 		predicate(k, v)
 	}
@@ -379,7 +380,7 @@ func (c *Dictionary[T, K]) ForEach(predicate func(T, K)) IDictionary[T, K] {
 // Map transforms the values in the Dictionary by applying the provided predicate function to each key-value pair.
 //
 // Parameters:
-//   - predicate: A function that takes a key of type T and a value of type K, and returns a new value of type K.
+//   - predicate: A function that takes a key of type K and a value of type V, and returns a new value of type V.
 //
 // Returns:
 //   - The Dictionary itself, with the transformed values.
@@ -388,7 +389,7 @@ func (c *Dictionary[T, K]) ForEach(predicate func(T, K)) IDictionary[T, K] {
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     dict.Map(func(k string, v int) int { return v * 2 })
 //     // dict will contain {"a": 2, "b": 4}
-func (c *Dictionary[T, K]) Map(predicate func(T, K) K) IDictionary[T, K] {
+func (c *Dictionary[K, V]) Map(predicate func(K, V) V) IDictionary[K, V] {
 	for k, v := range c.items {
 		c.items[k] = predicate(k, v)
 	}
@@ -404,8 +405,8 @@ func (c *Dictionary[T, K]) Map(predicate func(T, K) K) IDictionary[T, K] {
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     dict.Clean() // dict will be empty: {}
-func (c *Dictionary[T, K]) Clean() IDictionary[T, K] {
-	c.items = make(map[T]K)
+func (c *Dictionary[K, V]) Clean() IDictionary[K, V] {
+	c.items = make(map[K]V)
 	return c
 }
 
@@ -419,24 +420,126 @@ func (c *Dictionary[T, K]) Clean() IDictionary[T, K] {
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     clonedDict := dict.Clone() // clonedDict is a new Dictionary with the same contents as dict
-func (c *Dictionary[T, K]) Clone() IDictionary[T, K] {
-	cloned := make(map[T]K)
+func (c *Dictionary[K, V]) Clone() IDictionary[K, V] {
+	cloned := make(map[K]V)
 	for k, v := range c.items {
 		cloned[k] = v
 	}
 	return DictionaryFromMap(cloned)
 }
 
+// Max returns the key-value pair from the Dictionary that yields the maximum
+// score when evaluated with the provided predicate function.
+//
+// The predicate function is applied to each key-value pair in the Dictionary.
+// The pair that produces the highest integer score is returned along with
+// that score.
+//
+// Due to the unordered nature of maps, if multiple pairs produce the same
+// maximum score, the returned pair is not deterministic.
+//
+// Parameters:
+//   - predicate: A function that takes a key and a value, and returns an
+//     integer score used for comparison.
+//
+// Returns:
+//   - A Pair containing the key and value with the maximum score.
+//   - The maximum score returned by the predicate.
+//   - A boolean indicating whether the Dictionary was non-empty.
+//
+// Example usage:
+//     dict := DictionaryFromMap(map[string]int{"go": 14, "rust": 11, "zig": 3})
+//     pair, score, ok := dict.Max(func(k string, v int) int { return v })
+//     // pair.key == "go", pair.value == 14, score == 92, ok == true
+func (c *Dictionary[K, V]) Max(predicate func(k K, v V) int) (Pair[K, V], int, bool) {
+	if len(c.items) == 0 {
+		var zero_key K
+		var zero_val V
+		return NewPair(zero_key, zero_val), 0, false
+	}
+
+	var (
+		maxKey   K
+		maxValue V
+		maxScore int
+		init     bool
+	)
+
+	for k, v := range c.items {
+		score := predicate(k, v)
+
+		if !init || score >= maxScore {
+			maxKey = k
+			maxValue = v
+			maxScore = score
+			init = true
+		}
+	}
+
+	return NewPair(maxKey, maxValue), maxScore, true
+}
+
+// Min returns the key-value pair from the Dictionary that yields the minimum
+// score when evaluated with the provided predicate function.
+//
+// The predicate function is applied to each key-value pair in the Dictionary.
+// The pair that produces the smallest integer score is returned along with
+// that score.
+//
+// Due to the unordered nature of maps, if multiple pairs produce the same
+// minimum score, the returned pair is not deterministic.
+//
+// Parameters:
+//   - predicate: A function that takes a key and a value, and returns an
+//     integer score used for comparison.
+//
+// Returns:
+//   - A Pair containing the key and value that produced the minimum score.
+//   - The minimum score returned by the predicate.
+//   - A boolean indicating whether the Dictionary was non-empty.
+//
+// Example usage:
+//     dict := DictionaryFromMap(map[string]int{"go": 90, "rust": 85, "zig": 92})
+//     pair, score, ok := dict.Min(func(k string, v int) int { return v })
+//     // pair.key == "rust", pair.value == 85, score == 85, ok == true
+func (c *Dictionary[K, V]) Min(
+	predicate func(k K, v V) int,
+) (Pair[K, V], int, bool) {
+	if len(c.items) == 0 {
+		var zero_key K
+		var zero_val V
+		return Pair[K, V]{key: zero_key, value: zero_val}, 0, false
+	}
+
+	var (
+		minPair  Pair[K, V]
+		minScore int
+		init     bool
+	)
+
+	for k, v := range c.items {
+		score := predicate(k, v)
+
+		if !init || score <= minScore {
+			minPair = Pair[K, V]{key: k, value: v}
+			minScore = score
+			init = true
+		}
+	}
+
+	return minPair, minScore, true
+}
+
 // Keys returns a slice of all the keys in the Dictionary. The keys are returned in no specific order.
 //
 // Returns:
-//   - A slice of type []T containing all the keys in the Dictionary.
+//   - A slice of type []K containing all the keys in the Dictionary.
 //
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     keys := dict.Keys() // keys will contain []string{"a", "b", "c"}
-func (c Dictionary[T, K]) Keys() []T {
-	keys := make([]T, 0, len(c.items))
+func (c Dictionary[K, V]) Keys() []K {
+	keys := make([]K, 0, len(c.items))
 	for key := range c.items {
 		keys = append(keys, key)
 	}
@@ -446,25 +549,25 @@ func (c Dictionary[T, K]) Keys() []T {
 // KeysVector returns a Vector containing all the keys in the Dictionary.
 //
 // Returns:
-//   - A Vector[T] containing all the keys from the Dictionary.
+//   - A Vector[K] containing all the keys from the Dictionary.
 //
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     keysVector := dict.KeysVector() // keysVector will be a Vector containing ["a", "b", "c"]
-func (c Dictionary[T, K]) KeysVector() *Vector[T] {
+func (c Dictionary[K, V]) KeysVector() *Vector[K] {
 	return VectorFromList(c.Keys())
 }
 
 // Values returns a slice containing all the values in the Dictionary. The values are returned in no specific order.
 //
 // Returns:
-//   - A slice of type []K containing all the values in the Dictionary.
+//   - A slice of type []V containing all the values in the Dictionary.
 //
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     values := dict.Values() // values will contain []int{1, 2, 3}
-func (c *Dictionary[T, K]) Values() []K {
-	values := make([]K, 0, len(c.items))
+func (c *Dictionary[K, V]) Values() []V {
+	values := make([]V, 0, len(c.items))
 	for key := range c.items {
 		values = append(values, c.items[key])
 	}
@@ -474,27 +577,27 @@ func (c *Dictionary[T, K]) Values() []K {
 // ValuesVector returns a Vector containing all the values in the Dictionary.
 //
 // Returns:
-//   - A Vector[K] containing all the values from the Dictionary.
+//   - A Vector[V] containing all the values from the Dictionary.
 //
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     valuesVector := dict.ValuesVector() // valuesVector will be a Vector containing [1, 2, 3]
-func (c Dictionary[T, K]) ValuesVector() *Vector[K] {
+func (c Dictionary[K, V]) ValuesVector() *Vector[V] {
 	return VectorFromList(c.Values())
 }
 
-// Pairs returns a slice of key-value pairs in the Dictionary, where each pair is represented as a Pair[T, K].
+// Pairs returns a slice of key-value pairs in the Dictionary, where each pair is represented as a Pair[K, V].
 // The pairs are returned in no specific order.
 //
 // Returns:
-//   - A slice of type []Pair[T, K] containing all key-value pairs from the Dictionary.
+//   - A slice of type []Pair[K, V] containing all key-value pairs from the Dictionary.
 //
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2, "c": 3})
 //     pairs := dict.Pairs()
 //     // pairs will contain [{a 1}, {b 2}, {c 3}], where each Pair holds a key-value pair
-func (c *Dictionary[T, K]) Pairs() []Pair[T, K] {
-	pairs := make([]Pair[T, K], 0, len(c.items))
+func (c *Dictionary[K, V]) Pairs() []Pair[K, V] {
+	pairs := make([]Pair[K, V], 0, len(c.items))
 	for k, v := range c.items {
 		pairs = append(pairs, NewPair(k, v))
 	}
@@ -504,12 +607,12 @@ func (c *Dictionary[T, K]) Pairs() []Pair[T, K] {
 // Collect returns an intance map containing all the key-value pairs in the Dictionary.
 //
 // Returns:
-//   - A map of type map[T]K containing all key-value pairs in the Dictionary.
+//   - A map of type map[K]V containing all key-value pairs in the Dictionary.
 //
 // Example usage:
 //     dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //     collectedMap := dict.Collect() // collectedMap will be map[string]int{"a": 1, "b": 2}
-func (c Dictionary[T, K]) Collect() map[T]K {
+func (c Dictionary[K, V]) Collect() map[K]V {
 	return c.items
 }
 
@@ -517,18 +620,18 @@ func (c Dictionary[T, K]) Collect() map[T]K {
 // The predicate function is applied to each key and value, and its result is used as the new value in the returned Dictionary.
 //
 // Parameters:
-//   - c: A pointer to the Dictionary[T, K] from which the key-value pairs will be transformed.
-//   - predicate: A function that takes a key of type T and a value of type K, and returns a new value of type E. This function is applied to each key-value pair.
+//   - c: A pointer to the Dictionary[K, V] from which the key-value pairs will be transformed.
+//   - predicate: A function that takes a key of type K and a value of type V, and returns a new value of type E. This function is applied to each key-value pair.
 //
 // Returns:
-//   - A new IDictionary[T, E] where the keys remain the same, but the values are the result of applying the predicate function.
+//   - A new IDictionary[K, E] where the keys remain the same, but the values are the result of applying the predicate function.
 //
 // Example usage:
 //
 //	dict := DictionaryFromMap(map[string]int{"a": 1, "b": 2})
 //	newDict := DictionaryMap(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) })
 //	// newDict will contain {"a": "1", "b": "2"}, where the values are transformed to strings
-func DictionaryMap[T comparable, K, E any](c IDictionary[T, K], predicate func(T, K) E) IDictionary[T, E] {
+func DictionaryMap[K comparable, V, E any](c IDictionary[K, V], predicate func(K, V) E) IDictionary[K, E] {
 	return MapToDictionary(c.Collect(), predicate)
 }
 
@@ -536,57 +639,57 @@ func DictionaryMap[T comparable, K, E any](c IDictionary[T, K], predicate func(T
 // The predicate function is applied to each key and value, and its result is used as the new value in the returned Dictionary.
 //
 // Parameters:
-//   - c: A map[T]K from which the key-value pairs will be transformed.
-//   - predicate: A function that takes a key of type T and a value of type K, and returns a new value of type E. This function is applied to each key-value pair.
+//   - c: A map[K]V from which the key-value pairs will be transformed.
+//   - predicate: A function that takes a key of type K and a value of type V, and returns a new value of type E. This function is applied to each key-value pair.
 //
 // Returns:
-//   - A new IDictionary[T, E] where the keys remain the same, but the values are the result of applying the predicate function.
+//   - A new IDictionary[K, E] where the keys remain the same, but the values are the result of applying the predicate function.
 //
 // Example usage:
 //
 //	dict := map[string]int{"a": 1, "b": 2}
 //	newDict := MapToDictionary(dict, func(k string, v int) string { return fmt.Sprintf("%d", v) })
 //	// newDict will contain {"a": "1", "b": "2"}, where the values are transformed to strings
-func MapToDictionary[T comparable, K, E any](c map[T]K, predicate func(T, K) E) IDictionary[T, E] {
+func MapToDictionary[K comparable, V, E any](c map[K]V, predicate func(K, V) E) IDictionary[K, E] {
 	return MapToIDictionary(c, predicate, MakeDictionary)
 }
 
 // VectorMapToDictionary applies the given predicate function to each element in the IVector,
-// transforming each element of type T into an tuple of types E, that implements comparable, and K, then returns
+// transforming each element of type K into an tuple of types E, that implements comparable, and V, then returns
 // a new Dictionary with the transformed elements.
 //
 // Parameters:
-//   - c: The source IVector containing elements of type T.
-//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//   - c: The source IVector containing elements of type K.
+//   - predicate: A function that takes an element of type K and transforms it into an element of type V.
 //
 // Returns:
-//   - A new IDictionary[E, K] where the keys remain the same, but the values are the result of applying the predicate function.
+//   - A new IDictionary[E, V] where the keys remain the same, but the values are the result of applying the predicate function.
 //
 // Example usage:
 //
 //	vec := VectorFromList([]int{1, 2, 3, 4})
 //	transformed := VectorMapToDictionary(vec, func(v int) (string, int) { return fmt.Sprintf("Item %d", v), v })
 //	// transformed will be a new Vector with elements: {"Item 1": 1, "Item 2": 2, "Item 3": 3, "Item 4": 4}
-func VectorMapToDictionary[T, K any, E comparable](c IVector[T], predicate func(T) (E, K)) IDictionary[E, K] {
+func VectorMapToDictionary[K, V any, E comparable](c IVector[K], predicate func(K) (E, V)) IDictionary[E, V] {
 	return ListMapToDictionary(c.Collect(), predicate)
 }
 
 // ListMapToDictionary applies the given predicate function to each element in the slice,
-// transformng each element of type T into an tuple of types E, that implements comparable, and K, then returns
+// transformng each element of type K into an tuple of types E, that implements comparable, and V, then returns
 // a new Dictionary with the transformed elements.
 //
 // Parameters:
-//   - c: The slice IVector containing elements of type T.
-//   - predicate: A function that takes an element of type T and transforms it into an element of type K.
+//   - c: The slice IVector containing elements of type K.
+//   - predicate: A function that takes an element of type K and transforms it into an element of type V.
 //
 // Returns:
-//   - A new IDictionary[E, K] where the keys remain the same, but the values are the result of applying the predicate function.
+//   - A new IDictionary[E, V] where the keys remain the same, but the values are the result of applying the predicate function.
 //
 // Example usage:
 //
 //	slc := []int{1, 2, 3, 4}
 //	transformed := ListMapToDictionary(slc, func(v int) (string, int) { return fmt.Sprintf("Item %d", v), v })
 //	// transformed will be a new Vector with elements: {"Item 1": 1, "Item 2": 2, "Item 3": 3, "Item 4": 4}
-func ListMapToDictionary[T, K any, E comparable](c []T, predicate func(T) (E, K)) IDictionary[E, K] {
+func ListMapToDictionary[K, V any, E comparable](c []K, predicate func(K) (E, V)) IDictionary[E, V] {
 	return ListMapToIDictionary(c, predicate, MakeDictionary)
 }
